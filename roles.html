@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Role & Izin — LearnHub LMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════ VARIABLES ═══════════════════ */
+    :root {
+      --sidebar-w:260px; --sidebar-w-col:72px;
+      --topbar-h:64px; --footer-h:56px;
+      --primary:#2563eb; --primary-light:#3b82f6; --primary-xlight:#eff6ff; --primary-hover:#1d4ed8;
+      --accent:#06b6d4; --accent-light:#ecfeff;
+      --success:#10b981; --success-light:#ecfdf5;
+      --warning:#f59e0b; --warning-light:#fffbeb;
+      --danger:#ef4444; --danger-light:#fef2f2;
+      --purple:#8b5cf6; --purple-light:#f5f3ff;
+      --indigo:#6366f1; --indigo-light:#eef2ff;
+      --sidebar-bg:#0f172a; --sidebar-text:rgba(226,232,240,.75); --sidebar-text-act:#fff;
+      --sidebar-hover:rgba(255,255,255,.06); --sidebar-active:rgba(37,99,235,.25); --sidebar-border:rgba(255,255,255,.07);
+      --topbar-bg:#ffffff; --body-bg:#f1f5f9; --card-bg:#ffffff;
+      --card-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+      --card-shadow-hover:0 4px 12px rgba(37,99,235,.12),0 8px 32px rgba(0,0,0,.1);
+      --border:#e2e8f0; --text-main:#0f172a; --text-secondary:#64748b; --text-muted:#94a3b8;
+      --radius:14px; --radius-sm:8px;
+      --transition:all .25s cubic-bezier(.4,0,.2,1);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{height:100%;scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:var(--body-bg);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+    body.sidebar-overlay-open{overflow:hidden;}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+    ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+    /* ═══════════════════ SIDEBAR ═══════════════════ */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;z-index:200;transition:width .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+    .sidebar.collapsed{width:var(--sidebar-w-col);}
+    .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .sidebar-backdrop.show{opacity:1;pointer-events:all;}
+
+    .sidebar-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 18px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;overflow:hidden;min-height:72px;}
+    .brand-icon-wrap{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,99,235,.4);cursor:pointer;position:relative;overflow:hidden;}
+    .brand-icon-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.25),transparent 70%);opacity:0;transition:opacity .3s;}
+    .brand-icon-wrap:hover::after{opacity:1;}
+    .brand-icon-wrap i{color:#fff;font-size:18px;animation:iconFloat 3s ease-in-out infinite;}
+    @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0deg);}30%{transform:translateY(-2px) rotate(-5deg);}60%{transform:translateY(1px) rotate(3deg);}}
+    .brand-text-wrap{overflow:hidden;white-space:nowrap;transition:opacity .2s,width .28s;}
+    .brand-name{font-size:16px;font-weight:700;letter-spacing:-.3px;line-height:1.1;background:linear-gradient(135deg,#fff,#7dd3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .brand-version{font-size:10.5px;color:rgba(148,163,184,.7);font-weight:400;letter-spacing:.3px;margin-top:1px;}
+    .sidebar.collapsed .brand-text-wrap{opacity:0;pointer-events:none;width:0;}
+
+    .sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+    .sidebar-nav::-webkit-scrollbar{width:3px;}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+    .nav-category{font-size:9.5px;font-weight:600;color:rgba(148,163,184,.5);letter-spacing:1.2px;text-transform:uppercase;padding:14px 20px 5px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+    .sidebar.collapsed .nav-category{opacity:0;}
+
+    .nav-item-wrap{padding:2px 10px;}
+    .nav-link-custom{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--sidebar-text);text-decoration:none;font-size:13.5px;font-weight:500;transition:var(--transition);position:relative;overflow:hidden;white-space:nowrap;}
+    .nav-link-custom .nav-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.06);transition:var(--transition);}
+    .nav-link-custom:hover{background:var(--sidebar-hover);color:var(--sidebar-text-act);}
+    .nav-link-custom:hover .nav-icon{background:rgba(59,130,246,.2);color:var(--primary-light);}
+    .nav-link-custom.active{background:var(--sidebar-active);color:var(--sidebar-text-act);}
+    .nav-link-custom.active .nav-icon{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.45);}
+    .nav-link-custom.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--primary-light);border-radius:0 3px 3px 0;}
+    .nav-label{transition:opacity .2s,width .28s;}
+    .sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden;}
+    .nav-badge{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;transition:opacity .2s;}
+    .nav-badge.blue{background:rgba(59,130,246,.2);color:#93c5fd;}
+    .nav-badge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
+    .nav-badge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+    .sidebar.collapsed .nav-badge{opacity:0;width:0;overflow:hidden;}
+    .sidebar.collapsed .nav-link-custom{justify-content:center;padding:10px;}
+    .sidebar.collapsed .nav-link-custom .nav-icon{background:transparent;}
+
+    .sidebar-footer{padding:12px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:var(--transition);overflow:hidden;}
+    .sidebar-user:hover{background:var(--sidebar-hover);}
+    .sidebar-user-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+    .sidebar-user-info{overflow:hidden;}
+    .sidebar-user-name{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sidebar-user-role{font-size:10.5px;color:rgba(148,163,184,.6);}
+    .sidebar.collapsed .sidebar-user-info{display:none;}
+
+    @media(min-width:992px){
+      .sidebar.collapsed .nav-link-custom{position:relative;}
+      .sidebar.collapsed .nav-link-custom::after{content:attr(data-label);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--text-main);color:#fff;font-size:12px;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;}
+      .sidebar.collapsed .nav-link-custom:hover::after{opacity:1;}
+    }
+
+    /* ═══════════════════ MAIN AREA ═══════════════════ */
+    .main-area{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;transition:margin-left .28s cubic-bezier(.4,0,.2,1);}
+    .main-area.sidebar-collapsed{margin-left:var(--sidebar-w-col);}
+
+    /* ═══════════════════ TOPBAR ═══════════════════ */
+    .topbar{position:sticky;top:0;z-index:100;height:var(--topbar-h);background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .hamburger{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:18px;transition:var(--transition);}
+    .hamburger:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-search{flex:1;max-width:360px;position:relative;}
+    .topbar-search input{width:100%;padding:9px 14px 9px 38px;border-radius:10px;border:1.5px solid var(--border);background:var(--body-bg);color:var(--text-main);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:var(--transition);}
+    .topbar-search input::placeholder{color:var(--text-muted);}
+    .topbar-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+    .topbar-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;}
+    .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+    .topbar-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:17px;transition:var(--transition);position:relative;}
+    .topbar-btn:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-notif-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;animation:dotPulse 2s ease-in-out infinite;}
+    @keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+    .user-trigger{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:12px;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:var(--transition);position:relative;}
+    .user-trigger:hover{background:var(--primary-xlight);border-color:var(--primary-light);}
+    .user-avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+    .user-meta{text-align:left;}
+    .user-meta-name{font-size:12.5px;font-weight:600;color:var(--text-main);line-height:1.2;white-space:nowrap;}
+    .user-meta-email{font-size:10.5px;color:var(--text-muted);white-space:nowrap;}
+    .user-trigger i.chevron{font-size:13px;color:var(--text-muted);margin-left:2px;transition:transform .2s;}
+    .user-trigger.open i.chevron{transform:rotate(180deg);}
+    .user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);z-index:300;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);transform-origin:top right;transition:opacity .2s,transform .2s;}
+    .user-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .dropdown-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .dropdown-avatar{width:40px;height:40px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
+    .dropdown-user-name{font-size:13.5px;font-weight:600;color:var(--text-main);}
+    .dropdown-user-email{font-size:11.5px;color:var(--text-muted);}
+    .dropdown-role-badge{display:inline-block;margin-top:3px;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--primary-xlight);color:var(--primary);}
+    .dropdown-menu-list{padding:6px;}
+    .dropdown-item-custom{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:500;color:var(--text-main);cursor:pointer;transition:var(--transition);text-decoration:none;}
+    .dropdown-item-custom:hover{background:var(--primary-xlight);color:var(--primary);}
+    .dropdown-item-custom i{font-size:15px;color:var(--text-secondary);width:20px;}
+    .dropdown-item-custom:hover i{color:var(--primary);}
+    .dropdown-divider{height:1px;background:var(--border);margin:4px 6px;}
+    .dropdown-item-custom.logout{color:var(--danger);}
+    .dropdown-item-custom.logout i{color:var(--danger);}
+    .dropdown-item-custom.logout:hover{background:var(--danger-light);color:var(--danger);}
+
+    /* ═══════════════════ MODAL BASE ═══════════════════ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .modal-overlay.show{opacity:1;pointer-events:all;}
+
+    /* Logout modal */
+    .modal-box-sm{background:#fff;border-radius:20px;width:100%;max-width:400px;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.92) translateY(16px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+    .modal-overlay.show .modal-box-sm{transform:scale(1) translateY(0);}
+    .modal-icon-wrap{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,var(--danger-light),#fff0f0);border:2px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;animation:modalIconFloat 2.5s ease-in-out infinite;}
+    @keyframes modalIconFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-4px) rotate(-5deg);}}
+    .modal-icon-ring{position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(239,68,68,.2);animation:ringRotate 6s linear infinite;}
+    @keyframes ringRotate{to{transform:rotate(360deg);}}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text-main);}
+    .modal-desc{font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px;}
+    .modal-actions{display:flex;gap:10px;}
+    .btn-modal-cancel{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--border);background:transparent;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-modal-cancel:hover{background:var(--body-bg);border-color:#94a3b8;}
+    .btn-modal-confirm{flex:1;padding:11px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#f87171);font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:#fff;cursor:pointer;transition:var(--transition);box-shadow:0 4px 14px rgba(239,68,68,.35);}
+    .btn-modal-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.45);}
+
+    /* ═══════════════════ CONTENT ═══════════════════ */
+    .content-area{flex:1;padding:24px;min-height:calc(100vh - var(--topbar-h) - var(--footer-h));}
+
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px;}
+    .page-title-wrap{}
+    .page-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:var(--text-main);letter-spacing:-.3px;}
+    .page-title-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.3);background:linear-gradient(135deg,var(--indigo),var(--purple));}
+    .page-desc{font-size:13px;color:var(--text-muted);margin-top:4px;}
+    .breadcrumb-wrap{display:flex;align-items:center;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px 14px;gap:6px;font-size:13px;}
+    .breadcrumb-wrap i.home{color:var(--primary);font-size:15px;}
+    .breadcrumb-sep{color:var(--text-muted);}
+    .breadcrumb-cur{color:var(--primary);font-weight:600;}
+    .breadcrumb-past{color:var(--text-secondary);text-decoration:none;transition:color .2s;}
+    .breadcrumb-past:hover{color:var(--primary);}
+
+    /* ═══════════════════ STAT PILLS ═══════════════════ */
+    .stats-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
+    .stat-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 18px;box-shadow:var(--card-shadow);flex:1;min-width:140px;transition:var(--transition);}
+    .stat-pill:hover{box-shadow:var(--card-shadow-hover);transform:translateY(-1px);}
+    .stat-pill-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .stat-pill-val{font-size:18px;font-weight:700;line-height:1;}
+    .stat-pill-lbl{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+    /* ═══════════════════ TABLE CARD ═══════════════════ */
+    .table-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px;}
+
+    .table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+    .table-toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .table-toolbar-right{display:flex;align-items:center;gap:8px;}
+
+    .toolbar-title{font-size:14.5px;font-weight:700;color:var(--text-main);}
+    .toolbar-count{background:var(--primary-xlight);color:var(--primary);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;}
+
+    /* Search input */
+    .tbl-search{position:relative;}
+    .tbl-search input{padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);transition:var(--transition);width:220px;}
+    .tbl-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);width:260px;}
+    .tbl-search input::placeholder{color:var(--text-muted);}
+    .tbl-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none;}
+
+    /* Filter select */
+    .tbl-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);cursor:pointer;transition:var(--transition);}
+    .tbl-filter:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+
+    /* Btn Tambah */
+    .btn-tambah{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(37,99,235,.3);white-space:nowrap;}
+    .btn-tambah:hover{background:linear-gradient(135deg,var(--primary-hover),var(--primary));transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.4);}
+    .btn-tambah:active{transform:translateY(0);}
+
+    /* Table */
+    .table-wrap{overflow-x:auto;}
+    .tbl{width:100%;border-collapse:collapse;min-width:700px;}
+    .tbl thead th{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap;}
+    .tbl thead th:first-child{border-radius:0;}
+    .tbl tbody tr{transition:background .15s;}
+    .tbl tbody tr:hover td{background:#f8fafc;}
+    .tbl tbody td{padding:13px 16px;font-size:13.5px;color:var(--text-main);vertical-align:middle;border-bottom:1px solid #f1f5f9;}
+    .tbl tbody tr:last-child td{border-bottom:none;}
+
+    /* Role icon badge */
+    .role-icon-cell{display:flex;align-items:center;gap:12px;}
+    .role-icon-box{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+
+    .role-name{font-weight:600;font-size:13.5px;}
+    .role-guard{font-size:11.5px;color:var(--text-muted);margin-top:1px;}
+
+    /* Permissions chips */
+    .perm-chips{display:flex;flex-wrap:wrap;gap:5px;max-width:320px;}
+    .perm-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;background:#f1f5f9;color:var(--text-secondary);white-space:nowrap;}
+    .perm-chip i{font-size:10px;}
+    .perm-more{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;background:var(--primary-xlight);color:var(--primary);cursor:pointer;}
+
+    /* Status badge */
+    .badge-status{padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+    .badge-status.active{background:var(--success-light);color:var(--success);}
+    .badge-status.inactive{background:var(--danger-light);color:var(--danger);}
+    .badge-status.system{background:var(--indigo-light);color:var(--indigo);}
+
+    /* User count badge */
+    .user-count-badge{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text-secondary);}
+    .user-count-badge i{color:var(--text-muted);font-size:13px;}
+
+    /* Actions cell */
+    .action-cell{display:flex;align-items:center;gap:6px;}
+    .btn-action{width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:var(--transition);}
+    .btn-action.view{background:var(--primary-xlight);color:var(--primary);}
+    .btn-action.view:hover{background:var(--primary);color:#fff;}
+    .btn-action.edit{background:#f0fdf4;color:var(--success);}
+    .btn-action.edit:hover{background:var(--success);color:#fff;}
+    .btn-action.del{background:var(--danger-light);color:var(--danger);}
+    .btn-action.del:hover{background:var(--danger);color:#fff;}
+    .btn-action.perm{background:var(--purple-light);color:var(--purple);}
+    .btn-action.perm:hover{background:var(--purple);color:#fff;}
+
+    /* Table pagination */
+    .tbl-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .tbl-info{font-size:12.5px;color:var(--text-muted);}
+    .pagination-custom{display:flex;gap:4px;}
+    .page-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text-secondary);font-size:13px;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-weight:500;}
+    .page-btn:hover{background:var(--primary-xlight);border-color:var(--primary-light);color:var(--primary);}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3);}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* Empty state */
+    .empty-state{padding:48px 20px;text-align:center;}
+    .empty-state i{font-size:44px;color:var(--text-muted);margin-bottom:12px;display:block;}
+    .empty-state p{font-size:14px;color:var(--text-muted);}
+
+    /* ═══════════════════ ADD ROLE MODAL ═══════════════════ */
+    .modal-box-lg{background:#fff;border-radius:20px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:scale(.94) translateY(20px);transition:transform .3s cubic-bezier(.34,1.4,.64,1);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
+    .modal-overlay.show .modal-box-lg{transform:scale(1) translateY(0);}
+
+    .modal-header-custom{display:flex;align-items:center;gap:14px;padding:22px 24px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .modal-header-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--indigo),var(--purple));display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.3);animation:headerIconBob 2.5s ease-in-out infinite;}
+    @keyframes headerIconBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+    .modal-header-text h5{font-size:16px;font-weight:700;color:var(--text-main);margin:0;}
+    .modal-header-text p{font-size:12.5px;color:var(--text-muted);margin:2px 0 0;}
+    .modal-close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:none;background:var(--body-bg);color:var(--text-secondary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+    .modal-close:hover{background:var(--danger-light);color:var(--danger);}
+
+    .modal-body-custom{padding:22px 24px;overflow-y:auto;flex:1;}
+    .modal-body-custom::-webkit-scrollbar{width:4px;}
+    .modal-body-custom::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+
+    /* Form elements */
+    .form-group-custom{margin-bottom:18px;}
+    .form-label-custom{font-size:12.5px;font-weight:600;color:var(--text-main);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+    .form-label-custom .required{color:var(--danger);font-size:13px;}
+    .form-label-custom .hint{font-size:11px;color:var(--text-muted);font-weight:400;margin-left:4px;}
+
+    .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;}
+    .form-input::placeholder{color:var(--text-muted);}
+    .form-input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+    .form-input.is-invalid{border-color:var(--danger);background:rgba(239,68,68,.03);}
+    .form-input-with-icon{position:relative;}
+    .form-input-with-icon i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:15px;pointer-events:none;}
+    .form-input-with-icon .form-input{padding-left:38px;}
+    .form-input-with-icon:focus-within i{color:var(--primary);}
+
+    .field-error{font-size:11.5px;color:var(--danger);margin-top:4px;display:none;align-items:center;gap:4px;}
+    .field-error.show{display:flex;}
+
+    /* Color picker */
+    .color-picker-row{display:flex;flex-wrap:wrap;gap:8px;}
+    .color-dot{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2.5px solid transparent;transition:var(--transition);display:flex;align-items:center;justify-content:center;}
+    .color-dot:hover{transform:scale(1.15);}
+    .color-dot.selected{border-color:var(--text-main);transform:scale(1.1);}
+    .color-dot i{display:none;font-size:13px;color:#fff;}
+    .color-dot.selected i{display:block;}
+
+    /* Icon picker */
+    .icon-picker-row{display:flex;flex-wrap:wrap;gap:6px;}
+    .icon-opt{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--body-bg);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--text-secondary);transition:var(--transition);}
+    .icon-opt:hover{border-color:var(--primary-light);color:var(--primary);background:var(--primary-xlight);}
+    .icon-opt.selected{border-color:var(--primary);color:var(--primary);background:var(--primary-xlight);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+
+    /* Guard select */
+    .guard-tabs{display:flex;gap:8px;}
+    .guard-tab{flex:1;padding:9px;border-radius:9px;border:1.5px solid var(--border);background:var(--body-bg);font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;text-align:center;transition:var(--transition);}
+    .guard-tab.active{border-color:var(--primary);background:var(--primary-xlight);color:var(--primary);}
+
+    /* Permissions accordion */
+    .perm-section{margin-bottom:10px;}
+    .perm-section-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--body-bg);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:var(--transition);user-select:none;}
+    .perm-section-header:hover{background:var(--primary-xlight);border-color:var(--primary-light);}
+    .perm-section-header.open{background:var(--primary-xlight);border-color:var(--primary-light);border-radius:10px 10px 0 0;}
+    .perm-section-title{font-size:13px;font-weight:600;color:var(--text-main);flex:1;}
+    .perm-section-count{font-size:11px;color:var(--text-muted);}
+    .perm-section-chevron{color:var(--text-muted);font-size:14px;transition:transform .2s;}
+    .perm-section-header.open .perm-section-chevron{transform:rotate(180deg);}
+    .perm-check-all{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;}
+
+    .perm-section-body{display:none;border:1.5px solid var(--primary-light);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;}
+    .perm-section-body.open{display:block;}
+    .perm-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .perm-check-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-main);cursor:pointer;}
+    .perm-check-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer;flex-shrink:0;}
+
+    /* Status toggle */
+    .toggle-switch{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;}
+    .toggle-switch input{display:none;}
+    .toggle-track{width:42px;height:23px;border-radius:12px;background:#e2e8f0;transition:background .2s;position:relative;flex-shrink:0;}
+    .toggle-switch input:checked + .toggle-track{background:var(--primary);}
+    .toggle-thumb{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;}
+    .toggle-switch input:checked + .toggle-track .toggle-thumb{transform:translateX(19px);}
+    .toggle-label{font-size:13px;font-weight:500;color:var(--text-main);}
+
+    .modal-footer-custom{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#fafafa;}
+    .btn-cancel-modal{padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-cancel-modal:hover{background:var(--body-bg);}
+    .btn-save-modal{padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(37,99,235,.3);display:flex;align-items:center;gap:7px;}
+    .btn-save-modal:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.4);}
+    .btn-save-modal:active{transform:translateY(0);}
+    .btn-save-spinner{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    .btn-save-modal.loading .btn-save-text{display:none;}
+    .btn-save-modal.loading .btn-save-spinner{display:inline-block;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ═══════════════════ FOOTER ═══════════════════ */
+    .footer{height:var(--footer-h);background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;font-size:12.5px;color:var(--text-muted);flex-shrink:0;}
+    .footer-brand{font-weight:700;color:var(--primary);}
+    .footer-sep{color:var(--border);}
+    .footer-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+    .footer-link{color:var(--text-muted);text-decoration:none;transition:color .2s;}
+    .footer-link:hover{color:var(--primary);}
+    .footer-status{display:flex;align-items:center;gap:5px;}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:dotPulse 2s infinite;}
+
+    /* FAB */
+    .fab{position:fixed;bottom:28px;right:28px;z-index:150;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.4),0 2px 8px rgba(0,0,0,.15);transition:var(--transition);opacity:0;pointer-events:none;transform:translateY(16px) scale(.9);}
+    .fab.visible{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .fab:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 10px 28px rgba(37,99,235,.5);}
+
+    /* ═══════════════════ RESPONSIVE ═══════════════════ */
+    @media(max-width:991px){
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;}
+      .sidebar.mobile-open{transform:translateX(0);}
+      .main-area{margin-left:0!important;}
+      .topbar-search{display:none;}
+    }
+    @media(max-width:767px){
+      .content-area{padding:16px;}
+      .topbar{padding:0 16px;gap:8px;}
+      .page-header{flex-direction:column;}
+      .stats-row{gap:10px;}
+      .stat-pill{min-width:calc(50% - 5px);}
+      .tbl-search input{width:160px;}
+      .tbl-search input:focus{width:180px;}
+      .user-meta{display:none;}
+      .fab{bottom:20px;right:14px;}
+      .footer{padding:0 16px;}
+      .footer-right{display:none;}
+      .perm-checks{grid-template-columns:1fr;}
+    }
+    @media(max-width:575px){
+      .table-toolbar{flex-direction:column;align-items:stretch;}
+      .table-toolbar-left,.table-toolbar-right{flex-wrap:wrap;}
+      .tbl-search input{width:100%;}
+      .btn-tambah{width:100%;justify-content:center;}
+      .modal-box-lg{max-width:100%;border-radius:16px 16px 0 0;max-height:95vh;position:fixed;bottom:0;left:0;right:0;}
+      .modal-overlay{align-items:flex-end;padding:0;}
+    }
+
+    /* Animations */
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+    .table-card{animation:fadeInUp .4s ease both;}
+    .stat-pill:nth-child(1){animation:fadeInUp .35s ease both;}
+    .stat-pill:nth-child(2){animation:fadeInUp .4s ease both;}
+    .stat-pill:nth-child(3){animation:fadeInUp .45s ease both;}
+    .stat-pill:nth-child(4){animation:fadeInUp .5s ease both;}
+  </style>
+</head>
+<body>
+
+<!-- Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-mortarboard-fill"></i></div>
+    <div class="brand-text-wrap">
+      <div class="brand-name">LearnHub</div>
+      <div class="brand-version">LMS Platform v2.0</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-category">Overview</div>
+    <div class="nav-item-wrap">
+      <a href="dashboard.html" class="nav-link-custom" data-label="Dashboard">
+        <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Analitik">
+        <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
+        <span class="nav-label">Analitik</span>
+        <span class="nav-badge blue">Baru</span>
+      </a>
+    </div>
+
+    <div class="nav-category">Master Data</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kategori">
+        <span class="nav-icon"><i class="bi bi-tags-fill"></i></span>
+        <span class="nav-label">Kategori</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Tags">
+        <span class="nav-icon"><i class="bi bi-hash"></i></span>
+        <span class="nav-label">Tags</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pengguna">
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+        <span class="nav-label">Pengguna</span>
+        <span class="nav-badge green">24</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom active" data-label="Role & Izin">
+        <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
+        <span class="nav-label">Role & Izin</span>
+      </a>
+    </div>
+
+    <div class="nav-category">Akademik</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kursus">
+        <span class="nav-icon"><i class="bi bi-play-btn-fill"></i></span>
+        <span class="nav-label">Kursus</span>
+        <span class="nav-badge blue">380</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Instruktur">
+        <span class="nav-icon"><i class="bi bi-person-workspace"></i></span>
+        <span class="nav-label">Instruktur</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kuis">
+        <span class="nav-icon"><i class="bi bi-patch-question-fill"></i></span>
+        <span class="nav-label">Kuis</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Sertifikat">
+        <span class="nav-icon"><i class="bi bi-award-fill"></i></span>
+        <span class="nav-label">Sertifikat</span>
+      </a>
+    </div>
+
+    <div class="nav-category">Transaksi</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pesanan">
+        <span class="nav-icon"><i class="bi bi-bag-fill"></i></span>
+        <span class="nav-label">Pesanan</span>
+        <span class="nav-badge red">5</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kupon">
+        <span class="nav-icon"><i class="bi bi-ticket-perforated-fill"></i></span>
+        <span class="nav-label">Kupon</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pembayaran">
+        <span class="nav-icon"><i class="bi bi-credit-card-2-front-fill"></i></span>
+        <span class="nav-label">Pembayaran</span>
+      </a>
+    </div>
+
+    <div class="nav-category">Konten</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Blog">
+        <span class="nav-icon"><i class="bi bi-journal-richtext"></i></span>
+        <span class="nav-label">Blog</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Komentar">
+        <span class="nav-icon"><i class="bi bi-chat-dots-fill"></i></span>
+        <span class="nav-label">Komentar</span>
+        <span class="nav-badge red">12</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Media">
+        <span class="nav-icon"><i class="bi bi-images"></i></span>
+        <span class="nav-label">Media</span>
+      </a>
+    </div>
+
+    <div class="nav-category">Sistem</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pengaturan">
+        <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
+        <span class="nav-label">Pengaturan</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Log Aktivitas">
+        <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
+        <span class="nav-label">Log Aktivitas</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Ahmad Santoso</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-area" id="mainArea">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+      <i class="bi bi-list" id="hamburgerIcon"></i>
+    </button>
+    <div class="topbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Cari menu, kursus, pengguna...">
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn"><i class="bi bi-bell-fill"></i><span class="topbar-notif-dot"></span></button>
+      <button class="topbar-btn"><i class="bi bi-sun-fill"></i></button>
+      <div style="position:relative;">
+        <div class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+          <div class="user-avatar">A</div>
+          <div class="user-meta">
+            <div class="user-meta-name">Ahmad Santoso</div>
+            <div class="user-meta-email">ahmad@learnhub.id</div>
+          </div>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">A</div>
+            <div>
+              <div class="dropdown-user-name">Ahmad Santoso</div>
+              <div class="dropdown-user-email">ahmad@learnhub.id</div>
+              <span class="dropdown-role-badge">Administrator</span>
+            </div>
+          </div>
+          <div class="dropdown-menu-list">
+            <a href="#" class="dropdown-item-custom"><i class="bi bi-person-fill"></i> Profil Saya</a>
+            <a href="#" class="dropdown-item-custom"><i class="bi bi-gear-fill"></i> Pengaturan Akun</a>
+            <a href="#" class="dropdown-item-custom"><i class="bi bi-bell-fill"></i> Notifikasi<span class="nav-badge red ms-auto">3</span></a>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item-custom logout" onclick="showLogoutModal()"><i class="bi bi-box-arrow-right"></i> Keluar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content-area" id="contentArea">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title-wrap">
+        <div class="page-title">
+          <div class="page-title-icon"><i class="bi bi-shield-lock-fill"></i></div>
+          Role &amp; Izin
+        </div>
+        <div class="page-desc">Kelola role pengguna dan hak akses fitur platform sesuai Spatie Permission.</div>
+      </div>
+      <div class="breadcrumb-wrap">
+        <i class="bi bi-house-door-fill home"></i>
+        <span class="breadcrumb-sep">/</span>
+        <a href="dashboard.html" class="breadcrumb-past">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="#" class="breadcrumb-past">Master Data</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-cur">Role &amp; Izin</span>
+      </div>
+    </div>
+
+    <!-- Stat Pills -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--indigo-light);color:var(--indigo);"><i class="bi bi-shield-lock-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">6</div>
+          <div class="stat-pill-lbl">Total Role</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--primary-xlight);color:var(--primary);"><i class="bi bi-key-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">48</div>
+          <div class="stat-pill-lbl">Total Izin</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--success-light);color:var(--success);"><i class="bi bi-people-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">284</div>
+          <div class="stat-pill-lbl">Pengguna Terassign</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--warning-light);color:var(--warning);"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">2</div>
+          <div class="stat-pill-lbl">Tanpa Izin</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          <span class="toolbar-title">Daftar Role</span>
+          <span class="toolbar-count">6 role</span>
+        </div>
+        <div class="table-toolbar-right">
+          <div class="tbl-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Cari role..." id="searchRole" oninput="filterTable()">
+          </div>
+          <select class="tbl-filter" id="filterGuard" onchange="filterTable()">
+            <option value="">Semua guard</option>
+            <option value="web">web</option>
+            <option value="api">api</option>
+          </select>
+          <button class="btn-tambah" onclick="showAddModal()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Tambah Role</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="tbl" id="roleTable">
+          <thead>
+            <tr>
+              <th style="width:48px;">#</th>
+              <th>Role</th>
+              <th>Guard</th>
+              <th>Izin Terkait</th>
+              <th>Pengguna</th>
+              <th>Status</th>
+              <th style="width:140px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="roleTbody">
+
+            <!-- ROW 1: developer -->
+            <tr data-guard="web">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">01</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#eff6ff;">
+                    <i class="bi bi-code-slash" style="color:#2563eb;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">Developer</div>
+                    <div class="role-guard">Dibuat: 12 Jan 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#f0fdf4;color:#10b981;border-radius:6px;">web</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-asterisk"></i> Semua Akses</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 2</span></td>
+              <td><span class="badge-status system">System</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role" disabled style="opacity:.35;cursor:not-allowed;" title="Role system tidak dapat dihapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ROW 2: admin -->
+            <tr data-guard="web">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">02</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#f5f3ff;">
+                    <i class="bi bi-shield-fill-check" style="color:#8b5cf6;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">Admin</div>
+                    <div class="role-guard">Dibuat: 12 Jan 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#f0fdf4;color:#10b981;border-radius:6px;">web</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-people"></i> manage-users</span>
+                  <span class="perm-chip"><i class="bi bi-play-btn"></i> manage-courses</span>
+                  <span class="perm-chip"><i class="bi bi-journal"></i> manage-blog</span>
+                  <span class="perm-more">+12 lainnya</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 5</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ROW 3: lecturer -->
+            <tr data-guard="web">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">03</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#fffbeb;">
+                    <i class="bi bi-person-workspace" style="color:#f59e0b;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">Lecturer</div>
+                    <div class="role-guard">Dibuat: 13 Jan 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#f0fdf4;color:#10b981;border-radius:6px;">web</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-play-btn"></i> create-course</span>
+                  <span class="perm-chip"><i class="bi bi-pencil"></i> edit-own-course</span>
+                  <span class="perm-chip"><i class="bi bi-bar-chart"></i> view-analytics</span>
+                  <span class="perm-more">+6 lainnya</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 47</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ROW 4: student -->
+            <tr data-guard="web">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">04</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#ecfdf5;">
+                    <i class="bi bi-mortarboard-fill" style="color:#10b981;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">Student</div>
+                    <div class="role-guard">Dibuat: 13 Jan 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#f0fdf4;color:#10b981;border-radius:6px;">web</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-eye"></i> view-course</span>
+                  <span class="perm-chip"><i class="bi bi-chat"></i> post-discussion</span>
+                  <span class="perm-chip"><i class="bi bi-award"></i> get-certificate</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 228</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ROW 5: moderator -->
+            <tr data-guard="web">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">05</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#fef2f2;">
+                    <i class="bi bi-flag-fill" style="color:#ef4444;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">Moderator</div>
+                    <div class="role-guard">Dibuat: 20 Jan 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#f0fdf4;color:#10b981;border-radius:6px;">web</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-chat-x"></i> moderate-comment</span>
+                  <span class="perm-chip"><i class="bi bi-journal-x"></i> moderate-blog</span>
+                  <span class="perm-more">+3 lainnya</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 2</span></td>
+              <td><span class="badge-status inactive">Nonaktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ROW 6: api-client -->
+            <tr data-guard="api">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">06</span></td>
+              <td>
+                <div class="role-icon-cell">
+                  <div class="role-icon-box" style="background:#ecfeff;">
+                    <i class="bi bi-hdd-network-fill" style="color:#06b6d4;"></i>
+                  </div>
+                  <div>
+                    <div class="role-name">API Client</div>
+                    <div class="role-guard">Dibuat: 5 Feb 2025</div>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-size:12px;font-weight:600;padding:3px 10px;background:#ecfeff;color:#06b6d4;border-radius:6px;">api</span></td>
+              <td>
+                <div class="perm-chips">
+                  <span class="perm-chip"><i class="bi bi-eye"></i> api-read</span>
+                  <span class="perm-chip"><i class="bi bi-arrow-up-circle"></i> api-write</span>
+                </div>
+              </td>
+              <td><span class="user-count-badge"><i class="bi bi-people"></i> 0</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action perm" title="Kelola izin"><i class="bi bi-key-fill"></i></button>
+                  <button class="btn-action edit" title="Edit role"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus role"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty state row (hidden) -->
+            <tr id="emptyRow" style="display:none;">
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="bi bi-shield-slash"></i>
+                  <p>Tidak ada role yang cocok dengan pencarian.</p>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Pagination -->
+      <div class="tbl-footer">
+        <div class="tbl-info">Menampilkan <strong>6</strong> dari <strong>6</strong> role</div>
+        <div class="pagination-custom">
+          <button class="page-btn" disabled><i class="bi bi-chevron-left" style="font-size:11px;"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn" disabled><i class="bi bi-chevron-right" style="font-size:11px;"></i></button>
+        </div>
+      </div>
+
+    </div><!-- /.table-card -->
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-brand">LearnHub</span>
+    <span class="footer-sep">|</span>
+    <span>LMS Platform v2.0</span>
+    <span class="footer-sep">·</span>
+    <span>© 2025 LearnHub. All rights reserved.</span>
+    <div class="footer-right">
+      <a href="#" class="footer-link">Dokumentasi</a>
+      <a href="#" class="footer-link">Bantuan</a>
+      <div class="footer-status"><span class="status-dot"></span><span>Sistem normal</span></div>
+    </div>
+  </footer>
+
+</div><!-- /.main-area -->
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="bi bi-arrow-up-short" style="font-size:24px;"></i>
+</button>
+
+<!-- ══════════ MODAL TAMBAH ROLE ══════════ -->
+<div class="modal-overlay" id="addModal" onclick="handleAddModalBackdrop(event)">
+  <div class="modal-box-lg">
+
+    <!-- Header -->
+    <div class="modal-header-custom">
+      <div class="modal-header-icon"><i class="bi bi-shield-plus"></i></div>
+      <div class="modal-header-text">
+        <h5>Tambah Role Baru</h5>
+        <p>Buat role dan tetapkan izin akses yang sesuai</p>
+      </div>
+      <button class="modal-close" onclick="hideAddModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body-custom">
+
+      {{-- Breeze / Spatie: POST /roles --}}
+      <form id="addRoleForm" novalidate>
+        {{-- @csrf --}}
+
+        <!-- Nama Role -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Nama Role <span class="required">*</span> <span class="hint">— lowercase, tanpa spasi (contoh: head-teacher)</span></label>
+          <div class="form-input-with-icon">
+            <i class="bi bi-shield-lock"></i>
+            <input type="text" class="form-input" id="roleName" name="name" placeholder="cth: head-teacher" autocomplete="off">
+          </div>
+          <div class="field-error" id="errName"><i class="bi bi-exclamation-circle-fill"></i> Nama role wajib diisi</div>
+        </div>
+
+        <!-- Display Name -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Nama Tampilan <span class="hint">— ditampilkan di UI</span></label>
+          <div class="form-input-with-icon">
+            <i class="bi bi-fonts"></i>
+            <input type="text" class="form-input" id="roleDisplay" name="display_name" placeholder="cth: Head Teacher">
+          </div>
+        </div>
+
+        <!-- Guard -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Guard Name <span class="required">*</span></label>
+          <div class="guard-tabs">
+            <button type="button" class="guard-tab active" onclick="setGuard(this,'web')">
+              <i class="bi bi-globe me-1"></i> web
+            </button>
+            <button type="button" class="guard-tab" onclick="setGuard(this,'api')">
+              <i class="bi bi-hdd-network me-1"></i> api
+            </button>
+          </div>
+          <input type="hidden" id="guardValue" name="guard_name" value="web">
+        </div>
+
+        <!-- Warna role -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Warna Role</label>
+          <div class="color-picker-row">
+            <div class="color-dot selected" style="background:#2563eb;" onclick="selectColor(this,'#2563eb')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#8b5cf6;" onclick="selectColor(this,'#8b5cf6')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#10b981;" onclick="selectColor(this,'#10b981')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#f59e0b;" onclick="selectColor(this,'#f59e0b')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#ef4444;" onclick="selectColor(this,'#ef4444')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#06b6d4;" onclick="selectColor(this,'#06b6d4')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#f97316;" onclick="selectColor(this,'#f97316')"><i class="bi bi-check-lg"></i></div>
+            <div class="color-dot" style="background:#64748b;" onclick="selectColor(this,'#64748b')"><i class="bi bi-check-lg"></i></div>
+          </div>
+          <input type="hidden" id="colorValue" name="color" value="#2563eb">
+        </div>
+
+        <!-- Icon role -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Icon Role</label>
+          <div class="icon-picker-row">
+            <div class="icon-opt selected" onclick="selectIcon(this,'bi-shield-lock-fill')" data-icon="bi-shield-lock-fill"><i class="bi bi-shield-lock-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-person-fill')" data-icon="bi-person-fill"><i class="bi bi-person-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-people-fill')" data-icon="bi-people-fill"><i class="bi bi-people-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-mortarboard-fill')" data-icon="bi-mortarboard-fill"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-person-workspace')" data-icon="bi-person-workspace"><i class="bi bi-person-workspace"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-star-fill')" data-icon="bi-star-fill"><i class="bi bi-star-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-gem')" data-icon="bi-gem"><i class="bi bi-gem"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-code-slash')" data-icon="bi-code-slash"><i class="bi bi-code-slash"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-flag-fill')" data-icon="bi-flag-fill"><i class="bi bi-flag-fill"></i></div>
+            <div class="icon-opt" onclick="selectIcon(this,'bi-hdd-network-fill')" data-icon="bi-hdd-network-fill"><i class="bi bi-hdd-network-fill"></i></div>
+          </div>
+          <input type="hidden" id="iconValue" name="icon" value="bi-shield-lock-fill">
+        </div>
+
+        <!-- Deskripsi -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Deskripsi <span class="hint">(opsional)</span></label>
+          <textarea class="form-input" name="description" rows="2" placeholder="Deskripsi singkat tentang role ini..." style="resize:vertical;min-height:70px;"></textarea>
+        </div>
+
+        <!-- Izin Akses -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Izin Akses <span class="hint">— pilih sesuai kebutuhan role</span></label>
+
+          <!-- Section: Pengguna -->
+          <div class="perm-section">
+            <div class="perm-section-header" onclick="togglePermSection(this)">
+              <input type="checkbox" class="perm-check-all" onclick="checkAllSection(event,this)" title="Pilih semua">
+              <i class="bi bi-people-fill" style="color:var(--primary);font-size:14px;"></i>
+              <span class="perm-section-title">Manajemen Pengguna</span>
+              <span class="perm-section-count">4 izin</span>
+              <i class="bi bi-chevron-down perm-section-chevron"></i>
+            </div>
+            <div class="perm-section-body">
+              <div class="perm-checks">
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="user-view"> Lihat pengguna</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="user-create"> Tambah pengguna</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="user-edit"> Edit pengguna</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="user-delete"> Hapus pengguna</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Kursus -->
+          <div class="perm-section">
+            <div class="perm-section-header" onclick="togglePermSection(this)">
+              <input type="checkbox" class="perm-check-all" onclick="checkAllSection(event,this)" title="Pilih semua">
+              <i class="bi bi-play-btn-fill" style="color:var(--success);font-size:14px;"></i>
+              <span class="perm-section-title">Manajemen Kursus</span>
+              <span class="perm-section-count">6 izin</span>
+              <i class="bi bi-chevron-down perm-section-chevron"></i>
+            </div>
+            <div class="perm-section-body">
+              <div class="perm-checks">
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-view"> Lihat kursus</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-create"> Buat kursus</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-edit"> Edit kursus</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-delete"> Hapus kursus</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-publish"> Publish kursus</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="course-analytics"> Lihat analitik</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Blog -->
+          <div class="perm-section">
+            <div class="perm-section-header" onclick="togglePermSection(this)">
+              <input type="checkbox" class="perm-check-all" onclick="checkAllSection(event,this)" title="Pilih semua">
+              <i class="bi bi-journal-richtext" style="color:var(--warning);font-size:14px;"></i>
+              <span class="perm-section-title">Manajemen Blog</span>
+              <span class="perm-section-count">5 izin</span>
+              <i class="bi bi-chevron-down perm-section-chevron"></i>
+            </div>
+            <div class="perm-section-body">
+              <div class="perm-checks">
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="blog-view"> Lihat post</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="blog-create"> Buat post</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="blog-edit"> Edit post</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="blog-delete"> Hapus post</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="blog-moderate"> Moderasi komentar</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Transaksi -->
+          <div class="perm-section">
+            <div class="perm-section-header" onclick="togglePermSection(this)">
+              <input type="checkbox" class="perm-check-all" onclick="checkAllSection(event,this)" title="Pilih semua">
+              <i class="bi bi-credit-card-2-front-fill" style="color:var(--purple);font-size:14px;"></i>
+              <span class="perm-section-title">Transaksi & Pembayaran</span>
+              <span class="perm-section-count">4 izin</span>
+              <i class="bi bi-chevron-down perm-section-chevron"></i>
+            </div>
+            <div class="perm-section-body">
+              <div class="perm-checks">
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="order-view"> Lihat pesanan</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="order-manage"> Kelola pesanan</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="coupon-manage"> Kelola kupon</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="payment-view"> Lihat pembayaran</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Sistem -->
+          <div class="perm-section">
+            <div class="perm-section-header" onclick="togglePermSection(this)">
+              <input type="checkbox" class="perm-check-all" onclick="checkAllSection(event,this)" title="Pilih semua">
+              <i class="bi bi-gear-fill" style="color:var(--danger);font-size:14px;"></i>
+              <span class="perm-section-title">Pengaturan Sistem</span>
+              <span class="perm-section-count">4 izin</span>
+              <i class="bi bi-chevron-down perm-section-chevron"></i>
+            </div>
+            <div class="perm-section-body">
+              <div class="perm-checks">
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="setting-view"> Lihat pengaturan</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="setting-edit"> Edit pengaturan</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="role-manage"> Kelola role</label>
+                <label class="perm-check-item"><input type="checkbox" name="permissions[]" value="log-view"> Lihat log aktivitas</label>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.form-group permissions -->
+
+        <!-- Status toggle -->
+        <div class="form-group-custom" style="margin-bottom:0;">
+          <label class="form-label-custom">Status Role</label>
+          <label class="toggle-switch">
+            <input type="checkbox" name="is_active" checked id="toggleActive">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label" id="toggleLbl">Aktif</span>
+          </label>
+        </div>
+
+      </form>
+    </div><!-- /.modal-body -->
+
+    <!-- Footer -->
+    <div class="modal-footer-custom">
+      <button class="btn-cancel-modal" onclick="hideAddModal()"><i class="bi bi-x-lg me-1"></i> Batal</button>
+      <button class="btn-save-modal" id="btnSave" onclick="submitAddRole()">
+        <span class="btn-save-text"><i class="bi bi-shield-plus me-1"></i> Simpan Role</span>
+        <span class="btn-save-spinner"></span>
+      </button>
+    </div>
+
+  </div><!-- /.modal-box-lg -->
+</div><!-- /#addModal -->
+
+<!-- ══════════ LOGOUT MODAL ══════════ -->
+<div class="modal-overlay" id="logoutModal" onclick="if(event.target===this)hideLogoutModal()">
+  <div class="modal-box-sm">
+    <div class="modal-icon-wrap">
+      <div class="modal-icon-ring"></div>
+      <i class="bi bi-box-arrow-right" style="color:#ef4444;"></i>
+    </div>
+    <h3 class="modal-title">Yakin ingin keluar?</h3>
+    <p class="modal-desc">Anda akan keluar dari sesi aktif LearnHub.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="hideLogoutModal()"><i class="bi bi-x-lg me-1"></i> Batal</button>
+      <button class="btn-modal-confirm" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-1"></i> Ya, Keluar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ─── Sidebar ─── */
+  const sidebar = document.getElementById('sidebar');
+  const mainArea = document.getElementById('mainArea');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+  let sidebarCollapsed = false;
+  const isMobile = () => window.innerWidth < 992;
+
+  function toggleSidebar() {
+    if (isMobile()) {
+      const isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) closeMobileSidebar();
+      else { sidebar.classList.add('mobile-open'); backdrop.classList.add('show'); document.body.classList.add('sidebar-overlay-open'); }
+    } else {
+      sidebarCollapsed = !sidebarCollapsed;
+      sidebar.classList.toggle('collapsed', sidebarCollapsed);
+      mainArea.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+      hamburgerIcon.className = sidebarCollapsed ? 'bi bi-layout-sidebar' : 'bi bi-list';
+    }
+  }
+
+  function closeMobileSidebar() {
+    sidebar.classList.remove('mobile-open');
+    backdrop.classList.remove('show');
+    document.body.classList.remove('sidebar-overlay-open');
+  }
+
+  window.addEventListener('resize', () => { if (!isMobile()) closeMobileSidebar(); });
+
+  document.querySelectorAll('.nav-link-custom').forEach(l => {
+    l.addEventListener('click', function(e) {
+      if (!this.getAttribute('href') || this.getAttribute('href') === '#') e.preventDefault();
+      document.querySelectorAll('.nav-link-custom').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+      if (isMobile()) closeMobileSidebar();
+    });
+  });
+
+  /* ─── User dropdown ─── */
+  const userTrigger = document.getElementById('userTrigger');
+  const userDropdown = document.getElementById('userDropdown');
+  function toggleUserDropdown() {
+    const open = userDropdown.classList.toggle('open');
+    userTrigger.classList.toggle('open', open);
+  }
+  document.addEventListener('click', e => {
+    if (!userTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+      userDropdown.classList.remove('open');
+      userTrigger.classList.remove('open');
+    }
+  });
+
+  /* ─── Logout modal ─── */
+  function showLogoutModal() { userDropdown.classList.remove('open'); userTrigger.classList.remove('open'); document.getElementById('logoutModal').classList.add('show'); }
+  function hideLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+  function confirmLogout() {
+    const b = document.querySelector('#logoutModal .btn-modal-confirm');
+    b.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:14px;height:14px;border-width:2px;"></span> Keluar...';
+    b.disabled = true;
+    setTimeout(() => window.location.href = '/logout', 1400);
+  }
+
+  /* ─── FAB ─── */
+  const fab = document.getElementById('fabBtn');
+  window.addEventListener('scroll', () => fab.classList.toggle('visible', window.scrollY > 180), { passive: true });
+
+  /* ─── Table search/filter ─── */
+  function filterTable() {
+    const q = document.getElementById('searchRole').value.toLowerCase();
+    const g = document.getElementById('filterGuard').value;
+    const rows = document.querySelectorAll('#roleTbody tr:not(#emptyRow)');
+    let visible = 0;
+    rows.forEach(row => {
+      const txt  = row.textContent.toLowerCase();
+      const guard = row.dataset.guard || '';
+      const show = (!q || txt.includes(q)) && (!g || guard === g);
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('emptyRow').style.display = visible === 0 ? '' : 'none';
+  }
+
+  /* ─── Add Role Modal ─── */
+  function showAddModal() {
+    document.getElementById('addModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideAddModal() {
+    document.getElementById('addModal').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  function handleAddModalBackdrop(e) { if (e.target === document.getElementById('addModal')) hideAddModal(); }
+
+  /* Guard select */
+  function setGuard(btn, val) {
+    document.querySelectorAll('.guard-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('guardValue').value = val;
+  }
+
+  /* Color picker */
+  function selectColor(dot, val) {
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+    dot.classList.add('selected');
+    document.getElementById('colorValue').value = val;
+  }
+
+  /* Icon picker */
+  function selectIcon(el, val) {
+    document.querySelectorAll('.icon-opt').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('iconValue').value = val;
+  }
+
+  /* Permission accordion */
+  function togglePermSection(header) {
+    const isOpen = header.classList.contains('open');
+    const body = header.nextElementSibling;
+    header.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  }
+
+  function checkAllSection(e, checkbox) {
+    e.stopPropagation();
+    const section = checkbox.closest('.perm-section');
+    const checks = section.querySelectorAll('.perm-check-item input[type=checkbox]');
+    checks.forEach(c => c.checked = checkbox.checked);
+  }
+
+  /* Toggle label */
+  document.getElementById('toggleActive').addEventListener('change', function() {
+    document.getElementById('toggleLbl').textContent = this.checked ? 'Aktif' : 'Nonaktif';
+  });
+
+  /* Submit */
+  async function submitAddRole() {
+    const name = document.getElementById('roleName').value.trim();
+    const errName = document.getElementById('errName');
+    const btn = document.getElementById('btnSave');
+
+    errName.classList.remove('show');
+    document.getElementById('roleName').classList.remove('is-invalid');
+
+    if (!name) {
+      document.getElementById('roleName').classList.add('is-invalid');
+      errName.classList.add('show');
+      document.getElementById('roleName').focus();
+      return;
+    }
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    await new Promise(r => setTimeout(r, 1600));
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    hideAddModal();
+
+    // Success toast
+    showToast('Role "' + name + '" berhasil ditambahkan!', 'success');
+
+    // Reset form
+    document.getElementById('addRoleForm').reset();
+    document.querySelectorAll('.color-dot').forEach((d,i) => d.classList.toggle('selected', i===0));
+    document.querySelectorAll('.icon-opt').forEach((d,i) => d.classList.toggle('selected', i===0));
+    document.querySelectorAll('.guard-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+    document.getElementById('toggleLbl').textContent = 'Aktif';
+    document.querySelectorAll('.perm-section-header').forEach(h => { h.classList.remove('open'); h.nextElementSibling.classList.remove('open'); });
+  }
+
+  /* Toast notification */
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;top:80px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.15);background:${type==='success'?'#ecfdf5':'#fef2f2'};color:${type==='success'?'#10b981':'#ef4444'};border:1px solid ${type==='success'?'rgba(16,185,129,.3)':'rgba(239,68,68,.3)'};transform:translateX(120%);transition:transform .35s cubic-bezier(.34,1.4,.64,1);`;
+    t.innerHTML = `<i class="bi bi-${type==='success'?'check-circle-fill':'exclamation-circle-fill'}" style="font-size:17px;flex-shrink:0;"></i><span>${msg}</span>`;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => { t.style.transform = 'translateX(0)'; });
+    setTimeout(() => { t.style.transform = 'translateX(120%)'; setTimeout(() => t.remove(), 350); }, 3200);
+  }
+
+  /* ESC key */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { hideAddModal(); hideLogoutModal(); }
+  });
+</script>
+</body>
+</html>
