@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kategori — LearnHub LMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════ VARIABLES ══════════ */
+    :root {
+      --sidebar-w:260px;--sidebar-w-col:72px;
+      --topbar-h:64px;--footer-h:56px;
+      --primary:#2563eb;--primary-light:#3b82f6;--primary-xlight:#eff6ff;--primary-hover:#1d4ed8;
+      --accent:#06b6d4;--accent-light:#ecfeff;
+      --success:#10b981;--success-light:#ecfdf5;
+      --warning:#f59e0b;--warning-light:#fffbeb;
+      --danger:#ef4444;--danger-light:#fef2f2;
+      --purple:#8b5cf6;--purple-light:#f5f3ff;
+      --indigo:#6366f1;--indigo-light:#eef2ff;
+      --sidebar-bg:#0f172a;--sidebar-text:rgba(226,232,240,.75);--sidebar-text-act:#fff;
+      --sidebar-hover:rgba(255,255,255,.06);--sidebar-active:rgba(37,99,235,.25);--sidebar-border:rgba(255,255,255,.07);
+      --topbar-bg:#fff;--body-bg:#f1f5f9;--card-bg:#fff;
+      --card-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+      --card-shadow-hover:0 4px 12px rgba(37,99,235,.12),0 8px 32px rgba(0,0,0,.1);
+      --border:#e2e8f0;--text-main:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
+      --radius:14px;--radius-sm:8px;
+      --transition:all .25s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{height:100%;scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:var(--body-bg);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+    body.no-scroll{overflow:hidden;}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+    ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+    /* ══════════ SIDEBAR ══════════ */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;z-index:200;transition:width .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+    .sidebar.collapsed{width:var(--sidebar-w-col);}
+    .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .sidebar-backdrop.show{opacity:1;pointer-events:all;}
+    .sidebar-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 18px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;overflow:hidden;min-height:72px;}
+    .brand-icon-wrap{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,99,235,.4);cursor:pointer;position:relative;overflow:hidden;}
+    .brand-icon-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.25),transparent 70%);opacity:0;transition:opacity .3s;}
+    .brand-icon-wrap:hover::after{opacity:1;}
+    .brand-icon-wrap i{color:#fff;font-size:18px;animation:iconFloat 3s ease-in-out infinite;}
+    @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0deg);}30%{transform:translateY(-2px) rotate(-5deg);}60%{transform:translateY(1px) rotate(3deg);}}
+    .brand-text-wrap{overflow:hidden;white-space:nowrap;transition:opacity .2s,width .28s;}
+    .brand-name{font-size:16px;font-weight:700;letter-spacing:-.3px;line-height:1.1;background:linear-gradient(135deg,#fff,#7dd3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .brand-version{font-size:10.5px;color:rgba(148,163,184,.7);font-weight:400;letter-spacing:.3px;margin-top:1px;}
+    .sidebar.collapsed .brand-text-wrap{opacity:0;pointer-events:none;width:0;}
+    .sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+    .sidebar-nav::-webkit-scrollbar{width:3px;}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+    .nav-category{font-size:9.5px;font-weight:600;color:rgba(148,163,184,.5);letter-spacing:1.2px;text-transform:uppercase;padding:14px 20px 5px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+    .sidebar.collapsed .nav-category{opacity:0;}
+    .nav-item-wrap{padding:2px 10px;}
+    .nav-link-custom{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--sidebar-text);text-decoration:none;font-size:13.5px;font-weight:500;transition:var(--transition);position:relative;overflow:hidden;white-space:nowrap;}
+    .nav-link-custom .nav-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.06);transition:var(--transition);}
+    .nav-link-custom:hover{background:var(--sidebar-hover);color:var(--sidebar-text-act);}
+    .nav-link-custom:hover .nav-icon{background:rgba(59,130,246,.2);color:var(--primary-light);}
+    .nav-link-custom.active{background:var(--sidebar-active);color:var(--sidebar-text-act);}
+    .nav-link-custom.active .nav-icon{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.45);}
+    .nav-link-custom.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--primary-light);border-radius:0 3px 3px 0;}
+    .nav-label{transition:opacity .2s,width .28s;}
+    .sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden;}
+    .nav-badge{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;transition:opacity .2s;}
+    .nav-badge.blue{background:rgba(59,130,246,.2);color:#93c5fd;}
+    .nav-badge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
+    .nav-badge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+    .sidebar.collapsed .nav-badge{opacity:0;width:0;overflow:hidden;}
+    .sidebar.collapsed .nav-link-custom{justify-content:center;padding:10px;}
+    .sidebar.collapsed .nav-link-custom .nav-icon{background:transparent;}
+    .sidebar-footer{padding:12px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:var(--transition);overflow:hidden;}
+    .sidebar-user:hover{background:var(--sidebar-hover);}
+    .sidebar-user-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+    .sidebar-user-info{overflow:hidden;}
+    .sidebar-user-name{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sidebar-user-role{font-size:10.5px;color:rgba(148,163,184,.6);}
+    .sidebar.collapsed .sidebar-user-info{display:none;}
+    @media(min-width:992px){
+      .sidebar.collapsed .nav-link-custom{position:relative;}
+      .sidebar.collapsed .nav-link-custom::after{content:attr(data-label);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--text-main);color:#fff;font-size:12px;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;}
+      .sidebar.collapsed .nav-link-custom:hover::after{opacity:1;}
+    }
+
+    /* ══════════ MAIN ══════════ */
+    .main-area{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;transition:margin-left .28s cubic-bezier(.4,0,.2,1);}
+    .main-area.sidebar-collapsed{margin-left:var(--sidebar-w-col);}
+
+    /* ══════════ TOPBAR ══════════ */
+    .topbar{position:sticky;top:0;z-index:100;height:var(--topbar-h);background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .hamburger{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:18px;transition:var(--transition);}
+    .hamburger:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-search{flex:1;max-width:360px;position:relative;}
+    .topbar-search input{width:100%;padding:9px 14px 9px 38px;border-radius:10px;border:1.5px solid var(--border);background:var(--body-bg);color:var(--text-main);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:var(--transition);}
+    .topbar-search input::placeholder{color:var(--text-muted);}
+    .topbar-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+    .topbar-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;}
+    .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+    .topbar-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:17px;transition:var(--transition);position:relative;}
+    .topbar-btn:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-notif-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;animation:dotPulse 2s ease-in-out infinite;}
+    @keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+    .user-trigger{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:12px;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:var(--transition);position:relative;}
+    .user-trigger:hover{background:var(--primary-xlight);border-color:var(--primary-light);}
+    .user-ava-sm{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+    .user-meta{text-align:left;}
+    .user-meta-name{font-size:12.5px;font-weight:600;color:var(--text-main);line-height:1.2;white-space:nowrap;}
+    .user-meta-email{font-size:10.5px;color:var(--text-muted);white-space:nowrap;}
+    .user-trigger i.chevron{font-size:13px;color:var(--text-muted);margin-left:2px;transition:transform .2s;}
+    .user-trigger.open i.chevron{transform:rotate(180deg);}
+    .user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);z-index:300;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);transform-origin:top right;transition:opacity .2s,transform .2s;}
+    .user-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .dropdown-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .dropdown-avatar{width:40px;height:40px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
+    .dd-name{font-size:13.5px;font-weight:600;color:var(--text-main);}
+    .dd-email{font-size:11.5px;color:var(--text-muted);}
+    .dd-badge{display:inline-block;margin-top:3px;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--primary-xlight);color:var(--primary);}
+    .dropdown-menu-list{padding:6px;}
+    .dd-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:500;color:var(--text-main);cursor:pointer;transition:var(--transition);text-decoration:none;}
+    .dd-item:hover{background:var(--primary-xlight);color:var(--primary);}
+    .dd-item i{font-size:15px;color:var(--text-secondary);width:20px;}
+    .dd-item:hover i{color:var(--primary);}
+    .dd-divider{height:1px;background:var(--border);margin:4px 6px;}
+    .dd-item.logout{color:var(--danger);}
+    .dd-item.logout i{color:var(--danger);}
+    .dd-item.logout:hover{background:var(--danger-light);}
+
+    /* ══════════ CONTENT ══════════ */
+    .content-area{flex:1;padding:24px;min-height:calc(100vh - var(--topbar-h) - var(--footer-h));}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px;}
+    .page-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:var(--text-main);letter-spacing:-.3px;}
+    .page-title-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;background:linear-gradient(135deg,var(--warning),#fbbf24);box-shadow:0 4px 12px rgba(245,158,11,.3);}
+    .page-desc{font-size:13px;color:var(--text-muted);margin-top:4px;}
+    .breadcrumb-wrap{display:flex;align-items:center;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px 14px;gap:6px;font-size:13px;}
+    .breadcrumb-wrap i.home{color:var(--primary);font-size:15px;}
+    .breadcrumb-sep{color:var(--text-muted);}
+    .breadcrumb-cur{color:var(--primary);font-weight:600;}
+    .breadcrumb-past{color:var(--text-secondary);text-decoration:none;transition:color .2s;}
+    .breadcrumb-past:hover{color:var(--primary);}
+
+    /* ══════════ STAT PILLS ══════════ */
+    .stats-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
+    .stat-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 18px;box-shadow:var(--card-shadow);flex:1;min-width:140px;transition:var(--transition);animation:fadeInUp .4s ease both;}
+    .stat-pill:hover{box-shadow:var(--card-shadow-hover);transform:translateY(-1px);}
+    .stat-pill:nth-child(2){animation-delay:.05s;}
+    .stat-pill:nth-child(3){animation-delay:.1s;}
+    .stat-pill:nth-child(4){animation-delay:.15s;}
+    .stat-pill-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .stat-pill-val{font-size:18px;font-weight:700;line-height:1;}
+    .stat-pill-lbl{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+    /* ══════════ TABLE CARD ══════════ */
+    .table-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px;animation:fadeInUp .4s ease both;}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+    .table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+    .table-toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .table-toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .toolbar-title{font-size:14.5px;font-weight:700;color:var(--text-main);}
+    .toolbar-count{background:var(--warning-light);color:var(--warning);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;}
+
+    .tbl-search{position:relative;}
+    .tbl-search input{padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);transition:var(--transition);width:200px;}
+    .tbl-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);width:240px;}
+    .tbl-search input::placeholder{color:var(--text-muted);}
+    .tbl-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none;}
+
+    .tbl-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);cursor:pointer;transition:var(--transition);}
+    .tbl-filter:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+
+    .btn-tambah{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--warning),#fbbf24);color:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(245,158,11,.3);white-space:nowrap;}
+    .btn-tambah:hover{filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 6px 16px rgba(245,158,11,.4);}
+    .btn-tambah:active{transform:translateY(0);}
+
+    .btn-export{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text-secondary);font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:var(--transition);white-space:nowrap;}
+    .btn-export:hover{border-color:var(--primary-light);color:var(--primary);background:var(--primary-xlight);}
+
+    /* Table */
+    .table-wrap{overflow-x:auto;}
+    .tbl{width:100%;border-collapse:collapse;min-width:860px;}
+    .tbl thead th{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+    .tbl thead th:hover{color:var(--primary);}
+    .tbl thead th.sort-asc::after{content:' ↑';}
+    .tbl thead th.sort-desc::after{content:' ↓';}
+    .tbl tbody tr{transition:background .15s;}
+    .tbl tbody tr:hover td{background:#f8fafc;}
+    .tbl tbody td{padding:13px 16px;font-size:13.5px;color:var(--text-main);vertical-align:middle;border-bottom:1px solid #f1f5f9;}
+    .tbl tbody tr:last-child td{border-bottom:none;}
+
+    /* Category icon box */
+    .cat-icon-box{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+
+    /* Category name cell */
+    .cat-name-cell{display:flex;align-items:center;gap:12px;}
+    .cat-name{font-weight:600;font-size:13.5px;}
+    .cat-slug{font-size:11.5px;color:var(--text-muted);font-family:'Courier New',monospace;background:#f1f5f9;padding:1px 6px;border-radius:4px;}
+
+    /* Type badge */
+    .type-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:7px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+    .type-badge.course {background:#eff6ff;color:#2563eb;}
+    .type-badge.blog   {background:#f5f3ff;color:#8b5cf6;}
+    .type-badge.both   {background:#ecfdf5;color:#10b981;}
+
+    /* Parent badge */
+    .parent-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11.5px;font-weight:500;background:#f1f5f9;color:var(--text-secondary);white-space:nowrap;}
+    .parent-badge i{font-size:10px;}
+
+    /* Status badge */
+    .badge-status{padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+    .badge-status.active{background:var(--success-light);color:var(--success);}
+    .badge-status.inactive{background:var(--danger-light);color:var(--danger);}
+
+    /* Sort order */
+    .sort-order-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:#f1f5f9;font-size:12.5px;font-weight:700;color:var(--text-secondary);}
+
+    /* Count chips */
+    .count-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--text-secondary);}
+    .count-chip i{font-size:12px;}
+    .count-chip.blue{color:var(--primary);}
+
+    /* Action buttons */
+    .action-cell{display:flex;align-items:center;gap:6px;}
+    .btn-action{width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:var(--transition);}
+    .btn-action.view{background:var(--primary-xlight);color:var(--primary);}
+    .btn-action.view:hover{background:var(--primary);color:#fff;}
+    .btn-action.edit{background:#f0fdf4;color:var(--success);}
+    .btn-action.edit:hover{background:var(--success);color:#fff;}
+    .btn-action.del{background:var(--danger-light);color:var(--danger);}
+    .btn-action.del:hover{background:var(--danger);color:#fff;}
+    .btn-action.sub{background:#fff7ed;color:#ea580c;}
+    .btn-action.sub:hover{background:#ea580c;color:#fff;}
+
+    /* Child row indent */
+    .child-row td:first-child{padding-left:32px;}
+    .child-indent{display:flex;align-items:center;gap:8px;}
+    .child-indent::before{content:'';width:16px;height:2px;background:var(--border);flex-shrink:0;}
+
+    /* Table footer */
+    .tbl-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .tbl-info{font-size:12.5px;color:var(--text-muted);}
+    .pagination-custom{display:flex;gap:4px;}
+    .page-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text-secondary);font-size:13px;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-weight:500;}
+    .page-btn:hover{background:var(--primary-xlight);border-color:var(--primary-light);color:var(--primary);}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3);}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* Empty state */
+    .empty-state{padding:48px 20px;text-align:center;}
+    .empty-state i{font-size:44px;color:var(--text-muted);margin-bottom:12px;display:block;}
+    .empty-state p{font-size:14px;color:var(--text-muted);}
+
+    /* ══════════ MODAL OVERLAY ══════════ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .modal-overlay.show{opacity:1;pointer-events:all;}
+
+    /* ══════════ MODAL TAMBAH KATEGORI ══════════ */
+    .modal-box-lg{background:#fff;border-radius:20px;width:100%;max-width:580px;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:scale(.94) translateY(20px);transition:transform .3s cubic-bezier(.34,1.4,.64,1);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+    .modal-overlay.show .modal-box-lg{transform:scale(1) translateY(0);}
+
+    .modal-header-custom{display:flex;align-items:center;gap:14px;padding:22px 24px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .modal-header-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--warning),#fbbf24);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 12px rgba(245,158,11,.35);animation:headerBob 2.5s ease-in-out infinite;}
+    @keyframes headerBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+    .modal-header-text h5{font-size:16px;font-weight:700;color:var(--text-main);margin:0;}
+    .modal-header-text p{font-size:12.5px;color:var(--text-muted);margin:2px 0 0;}
+    .modal-close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:none;background:var(--body-bg);color:var(--text-secondary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+    .modal-close:hover{background:var(--danger-light);color:var(--danger);}
+
+    .modal-body-custom{padding:22px 24px;overflow-y:auto;flex:1;}
+    .modal-body-custom::-webkit-scrollbar{width:4px;}
+    .modal-body-custom::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+
+    /* Form */
+    .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group-custom{margin-bottom:16px;}
+    .form-label-custom{font-size:12.5px;font-weight:600;color:var(--text-main);margin-bottom:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+    .form-label-custom .req{color:var(--danger);}
+    .form-label-custom .hint{font-size:11px;color:var(--text-muted);font-weight:400;}
+
+    .input-icon-wrap{position:relative;}
+    .input-icon-wrap i.ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:15px;pointer-events:none;transition:color .2s;}
+    .input-icon-wrap:focus-within i.ico{color:var(--primary);}
+
+    .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;}
+    .form-input.has-icon{padding-left:38px;}
+    .form-input::placeholder{color:var(--text-muted);}
+    .form-input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+    .form-input.is-invalid{border-color:var(--danger);background:rgba(239,68,68,.03);}
+    .form-input.is-invalid:focus{box-shadow:0 0 0 3px rgba(239,68,68,.12);}
+
+    .form-select{width:100%;padding:10px 36px 10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;cursor:pointer;transition:var(--transition);}
+    .form-select:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+    .form-select.is-invalid{border-color:var(--danger);}
+
+    .form-textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;resize:vertical;min-height:80px;line-height:1.6;}
+    .form-textarea::placeholder{color:var(--text-muted);}
+    .form-textarea:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+
+    .field-error{font-size:11.5px;color:var(--danger);margin-top:4px;display:none;align-items:center;gap:4px;}
+    .field-error.show{display:flex;}
+
+    /* Slug preview */
+    .slug-preview{display:flex;align-items:center;gap:8px;margin-top:6px;padding:7px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;}
+    .slug-preview-label{font-size:11px;color:var(--text-muted);font-weight:500;flex-shrink:0;}
+    .slug-preview-val{font-size:12px;font-family:'Courier New',monospace;color:var(--primary);font-weight:600;}
+
+    /* Icon picker */
+    .icon-picker-wrap{display:flex;flex-direction:column;gap:8px;}
+    .icon-picker-tabs{display:flex;gap:4px;flex-wrap:wrap;}
+    .icon-tab{padding:5px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--body-bg);font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .icon-tab.active{border-color:var(--warning);background:var(--warning-light);color:var(--warning);}
+    .icon-grid{display:flex;flex-wrap:wrap;gap:6px;}
+    .icon-opt{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:var(--body-bg);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;color:var(--text-secondary);transition:var(--transition);}
+    .icon-opt:hover{border-color:var(--warning);color:var(--warning);background:var(--warning-light);}
+    .icon-opt.selected{border-color:var(--warning);color:var(--warning);background:var(--warning-light);box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+
+    /* Cover image upload */
+    .cover-upload-wrap{display:flex;align-items:center;gap:14px;padding:14px;background:var(--body-bg);border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;transition:var(--transition);}
+    .cover-upload-wrap:hover{border-color:var(--warning);background:var(--warning-light);}
+    .cover-thumb{width:60px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+    .cover-thumb-empty{width:60px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--warning-light),#fef3c7);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .cover-info h6{font-size:13px;font-weight:600;color:var(--text-main);margin:0 0 2px;}
+    .cover-info p{font-size:11.5px;color:var(--text-muted);margin:0;}
+    #coverInput{display:none;}
+
+    /* Sort order input with up/down */
+    .sort-input-wrap{display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;transition:var(--transition);}
+    .sort-input-wrap:focus-within{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+    .sort-input-wrap input{width:100%;padding:10px 14px;border:none;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;background:transparent;text-align:center;}
+    .sort-input-wrap input::-webkit-outer-spin-button,
+    .sort-input-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;}
+    .sort-btn{width:36px;flex-shrink:0;background:var(--body-bg);border:none;cursor:pointer;color:var(--text-secondary);font-size:16px;display:flex;align-items:center;justify-content:center;padding:0;transition:var(--transition);height:100%;}
+    .sort-btn:hover{background:var(--primary-xlight);color:var(--primary);}
+
+    /* Section divider */
+    .section-divider{display:flex;align-items:center;gap:10px;margin:18px 0 14px;}
+    .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .section-divider span{font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;}
+
+    /* Toggle switch */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;background:#fff;}
+    .toggle-row-info h6{font-size:13px;font-weight:600;color:var(--text-main);margin:0 0 1px;}
+    .toggle-row-info p{font-size:11.5px;color:var(--text-muted);margin:0;}
+    .toggle-switch{display:inline-flex;align-items:center;cursor:pointer;}
+    .toggle-switch input{display:none;}
+    .toggle-track{width:42px;height:23px;border-radius:12px;background:#e2e8f0;transition:background .2s;position:relative;flex-shrink:0;}
+    .toggle-switch input:checked + .toggle-track{background:var(--primary);}
+    .toggle-thumb{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;}
+    .toggle-switch input:checked + .toggle-track .toggle-thumb{transform:translateX(19px);}
+
+    /* Modal footer */
+    .modal-footer-custom{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#fafafa;}
+    .btn-cancel-modal{padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-cancel-modal:hover{background:var(--body-bg);}
+    .btn-save-modal{padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--warning),#fbbf24);color:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(245,158,11,.3);display:flex;align-items:center;gap:7px;}
+    .btn-save-modal:hover{filter:brightness(1.07);transform:translateY(-1px);box-shadow:0 6px 16px rgba(245,158,11,.4);}
+    .btn-spinner{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    .btn-save-modal.loading .btn-save-text{display:none;}
+    .btn-save-modal.loading .btn-spinner{display:inline-block;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ══════════ LOGOUT MODAL ══════════ */
+    .modal-box-sm{background:#fff;border-radius:20px;width:100%;max-width:400px;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.92) translateY(16px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+    .modal-overlay.show .modal-box-sm{transform:scale(1) translateY(0);}
+    .modal-icon-wrap{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:var(--danger-light);border:2px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;animation:modalFloat 2.5s ease-in-out infinite;}
+    @keyframes modalFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-4px) rotate(-5deg);}}
+    .modal-icon-ring{position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(239,68,68,.2);animation:ringRotate 6s linear infinite;}
+    @keyframes ringRotate{to{transform:rotate(360deg);}}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text-main);}
+    .modal-desc{font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px;}
+    .modal-actions{display:flex;gap:10px;}
+    .btn-modal-cancel{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--border);background:transparent;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-modal-cancel:hover{background:var(--body-bg);}
+    .btn-modal-confirm{flex:1;padding:11px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#f87171);font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:#fff;cursor:pointer;transition:var(--transition);box-shadow:0 4px 14px rgba(239,68,68,.35);}
+    .btn-modal-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.45);}
+
+    /* ══════════ FOOTER ══════════ */
+    .footer{height:var(--footer-h);background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;font-size:12.5px;color:var(--text-muted);flex-shrink:0;}
+    .footer-brand{font-weight:700;color:var(--primary);}
+    .footer-sep{color:var(--border);}
+    .footer-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+    .footer-link{color:var(--text-muted);text-decoration:none;transition:color .2s;}
+    .footer-link:hover{color:var(--primary);}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:dotPulse 2s infinite;}
+
+    /* ══════════ FAB ══════════ */
+    .fab{position:fixed;bottom:28px;right:28px;z-index:150;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.4);transition:var(--transition);opacity:0;pointer-events:none;transform:translateY(16px) scale(.9);}
+    .fab.visible{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .fab:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 10px 28px rgba(37,99,235,.5);}
+
+    /* ══════════ RESPONSIVE ══════════ */
+    @media(max-width:991px){
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;}
+      .sidebar.mobile-open{transform:translateX(0);}
+      .main-area{margin-left:0!important;}
+      .topbar-search{display:none;}
+    }
+    @media(max-width:767px){
+      .content-area{padding:16px;}
+      .topbar{padding:0 16px;gap:8px;}
+      .page-header{flex-direction:column;}
+      .stats-row{gap:10px;}
+      .stat-pill{min-width:calc(50% - 5px);}
+      .user-meta{display:none;}
+      .fab{bottom:20px;right:14px;}
+      .footer{padding:0 16px;}
+      .footer-right{display:none;}
+      .form-row-2{grid-template-columns:1fr;}
+    }
+    @media(max-width:575px){
+      .table-toolbar{flex-direction:column;align-items:stretch;}
+      .table-toolbar-right{flex-wrap:wrap;}
+      .tbl-search input,.tbl-search input:focus{width:100%;}
+      .btn-tambah,.btn-export{flex:1;justify-content:center;}
+      .modal-box-lg{max-width:100%;border-radius:20px 20px 0 0;max-height:95vh;position:fixed;bottom:0;left:0;right:0;}
+      .modal-overlay{align-items:flex-end;padding:0;}
+      .icon-grid .icon-opt{width:34px;height:34px;font-size:15px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-mortarboard-fill"></i></div>
+    <div class="brand-text-wrap">
+      <div class="brand-name">LearnHub</div>
+      <div class="brand-version">LMS Platform v2.0</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-category">Overview</div>
+    <div class="nav-item-wrap">
+      <a href="dashboard.html" class="nav-link-custom" data-label="Dashboard">
+        <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Analitik">
+        <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
+        <span class="nav-label">Analitik</span>
+        <span class="nav-badge blue">Baru</span>
+      </a>
+    </div>
+    <div class="nav-category">Master Data</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom active" data-label="Kategori">
+        <span class="nav-icon"><i class="bi bi-tags-fill"></i></span>
+        <span class="nav-label">Kategori</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Tags">
+        <span class="nav-icon"><i class="bi bi-hash"></i></span>
+        <span class="nav-label">Tags</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="users.html" class="nav-link-custom" data-label="Pengguna">
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+        <span class="nav-label">Pengguna</span>
+        <span class="nav-badge green">284</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="roles.html" class="nav-link-custom" data-label="Role & Izin">
+        <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
+        <span class="nav-label">Role & Izin</span>
+      </a>
+    </div>
+    <div class="nav-category">Akademik</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kursus">
+        <span class="nav-icon"><i class="bi bi-play-btn-fill"></i></span>
+        <span class="nav-label">Kursus</span>
+        <span class="nav-badge blue">380</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Instruktur">
+        <span class="nav-icon"><i class="bi bi-person-workspace"></i></span>
+        <span class="nav-label">Instruktur</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kuis">
+        <span class="nav-icon"><i class="bi bi-patch-question-fill"></i></span>
+        <span class="nav-label">Kuis</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Sertifikat">
+        <span class="nav-icon"><i class="bi bi-award-fill"></i></span>
+        <span class="nav-label">Sertifikat</span>
+      </a>
+    </div>
+    <div class="nav-category">Transaksi</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pesanan">
+        <span class="nav-icon"><i class="bi bi-bag-fill"></i></span>
+        <span class="nav-label">Pesanan</span>
+        <span class="nav-badge red">5</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kupon">
+        <span class="nav-icon"><i class="bi bi-ticket-perforated-fill"></i></span>
+        <span class="nav-label">Kupon</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pembayaran">
+        <span class="nav-icon"><i class="bi bi-credit-card-2-front-fill"></i></span>
+        <span class="nav-label">Pembayaran</span>
+      </a>
+    </div>
+    <div class="nav-category">Konten</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Blog">
+        <span class="nav-icon"><i class="bi bi-journal-richtext"></i></span>
+        <span class="nav-label">Blog</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Komentar">
+        <span class="nav-icon"><i class="bi bi-chat-dots-fill"></i></span>
+        <span class="nav-label">Komentar</span>
+        <span class="nav-badge red">12</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Media">
+        <span class="nav-icon"><i class="bi bi-images"></i></span>
+        <span class="nav-label">Media</span>
+      </a>
+    </div>
+    <div class="nav-category">Sistem</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pengaturan">
+        <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
+        <span class="nav-label">Pengaturan</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Log Aktivitas">
+        <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
+        <span class="nav-label">Log Aktivitas</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Ahmad Santoso</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main-area" id="mainArea">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+      <i class="bi bi-list" id="hamburgerIcon"></i>
+    </button>
+    <div class="topbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Cari menu, kategori, kursus...">
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn"><i class="bi bi-bell-fill"></i><span class="topbar-notif-dot"></span></button>
+      <button class="topbar-btn"><i class="bi bi-sun-fill"></i></button>
+      <div style="position:relative;">
+        <div class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+          <div class="user-ava-sm">A</div>
+          <div class="user-meta">
+            <div class="user-meta-name">Ahmad Santoso</div>
+            <div class="user-meta-email">ahmad@learnhub.id</div>
+          </div>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">A</div>
+            <div>
+              <div class="dd-name">Ahmad Santoso</div>
+              <div class="dd-email">ahmad@learnhub.id</div>
+              <span class="dd-badge">Administrator</span>
+            </div>
+          </div>
+          <div class="dropdown-menu-list">
+            <a href="#" class="dd-item"><i class="bi bi-person-fill"></i> Profil Saya</a>
+            <a href="#" class="dd-item"><i class="bi bi-gear-fill"></i> Pengaturan Akun</a>
+            <a href="#" class="dd-item"><i class="bi bi-bell-fill"></i> Notifikasi <span class="nav-badge red ms-auto">3</span></a>
+            <div class="dd-divider"></div>
+            <div class="dd-item logout" onclick="showLogoutModal()"><i class="bi bi-box-arrow-right"></i> Keluar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content-area" id="contentArea">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">
+          <div class="page-title-icon"><i class="bi bi-tags-fill"></i></div>
+          Kategori
+        </div>
+        <div class="page-desc">Kelola kategori untuk kursus dan blog — mendukung hierarki induk &amp; anak.</div>
+      </div>
+      <div class="breadcrumb-wrap">
+        <i class="bi bi-house-door-fill home"></i>
+        <span class="breadcrumb-sep">/</span>
+        <a href="dashboard.html" class="breadcrumb-past">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="#" class="breadcrumb-past">Master Data</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-cur">Kategori</span>
+      </div>
+    </div>
+
+    <!-- Stat Pills -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--warning-light);color:var(--warning);"><i class="bi bi-tags-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">16</div>
+          <div class="stat-pill-lbl">Total Kategori</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--primary-xlight);color:var(--primary);"><i class="bi bi-play-btn-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">9</div>
+          <div class="stat-pill-lbl">Kategori Kursus</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--purple-light);color:var(--purple);"><i class="bi bi-journal-richtext"></i></div>
+        <div>
+          <div class="stat-pill-val">4</div>
+          <div class="stat-pill-lbl">Kategori Blog</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--success-light);color:var(--success);"><i class="bi bi-layers-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">3</div>
+          <div class="stat-pill-lbl">Kedua (Both)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          <span class="toolbar-title">Daftar Kategori</span>
+          <span class="toolbar-count">16 kategori</span>
+        </div>
+        <div class="table-toolbar-right">
+          <div class="tbl-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Cari nama / slug..." id="searchCat" oninput="filterTable()">
+          </div>
+          <select class="tbl-filter" id="filterType" onchange="filterTable()">
+            <option value="">Semua tipe</option>
+            <option value="course">Course</option>
+            <option value="blog">Blog</option>
+            <option value="both">Both</option>
+          </select>
+          <select class="tbl-filter" id="filterStatus" onchange="filterTable()">
+            <option value="">Semua status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+          <button class="btn-export" onclick="showToast('Mengekspor data...','info')">
+            <i class="bi bi-download"></i> Export
+          </button>
+          <button class="btn-tambah" onclick="showAddModal()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Tambah Kategori</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="tbl" id="catTable">
+          <thead>
+            <tr>
+              <th style="width:44px;">#</th>
+              <th>Kategori</th>
+              <th>Tipe</th>
+              <th>Induk</th>
+              <th>Kursus</th>
+              <th>Post</th>
+              <th>Urutan</th>
+              <th>Status</th>
+              <th style="width:140px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="catTbody">
+
+            <!-- 01 Programming (parent) -->
+            <tr data-type="course" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">01</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#eff6ff;"><span>💻</span></div>
+                  <div>
+                    <div class="cat-name">Programming</div>
+                    <div class="cat-slug">programming</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge course"><i class="bi bi-play-btn-fill"></i> Course</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 124</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 0</span></td>
+              <td><span class="sort-order-badge">1</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 01a Web Development (child of Programming) -->
+            <tr class="child-row" data-type="course" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;padding-left:16px;">01a</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="child-indent" style="flex-shrink:0;"></div>
+                  <div class="cat-icon-box" style="background:#eff6ff;width:34px;height:34px;font-size:15px;"><span>🌐</span></div>
+                  <div>
+                    <div class="cat-name">Web Development</div>
+                    <div class="cat-slug">web-development</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge course"><i class="bi bi-play-btn-fill"></i> Course</span></td>
+              <td><span class="parent-badge"><i class="bi bi-diagram-3"></i> Programming</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 68</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 0</span></td>
+              <td><span class="sort-order-badge">1</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 01b Mobile Development (child of Programming) -->
+            <tr class="child-row" data-type="course" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;padding-left:16px;">01b</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="child-indent" style="flex-shrink:0;"></div>
+                  <div class="cat-icon-box" style="background:#ecfdf5;width:34px;height:34px;font-size:15px;"><span>📱</span></div>
+                  <div>
+                    <div class="cat-name">Mobile Development</div>
+                    <div class="cat-slug">mobile-development</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge course"><i class="bi bi-play-btn-fill"></i> Course</span></td>
+              <td><span class="parent-badge"><i class="bi bi-diagram-3"></i> Programming</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 42</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 0</span></td>
+              <td><span class="sort-order-badge">2</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 02 Design (parent) -->
+            <tr data-type="both" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">02</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#fdf4ff;"><span>🎨</span></div>
+                  <div>
+                    <div class="cat-name">Design</div>
+                    <div class="cat-slug">design</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge both"><i class="bi bi-layers-fill"></i> Both</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 55</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 12</span></td>
+              <td><span class="sort-order-badge">2</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 02a UI/UX Design (child of Design) -->
+            <tr class="child-row" data-type="both" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;padding-left:16px;">02a</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="child-indent" style="flex-shrink:0;"></div>
+                  <div class="cat-icon-box" style="background:#fdf4ff;width:34px;height:34px;font-size:15px;"><span>🖌️</span></div>
+                  <div>
+                    <div class="cat-name">UI/UX Design</div>
+                    <div class="cat-slug">ui-ux-design</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge both"><i class="bi bi-layers-fill"></i> Both</span></td>
+              <td><span class="parent-badge"><i class="bi bi-diagram-3"></i> Design</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 31</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 8</span></td>
+              <td><span class="sort-order-badge">1</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 03 Data Science (parent) -->
+            <tr data-type="course" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">03</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#ecfdf5;"><span>📊</span></div>
+                  <div>
+                    <div class="cat-name">Data Science</div>
+                    <div class="cat-slug">data-science</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge course"><i class="bi bi-play-btn-fill"></i> Course</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 48</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 0</span></td>
+              <td><span class="sort-order-badge">3</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 04 Business (parent, both) -->
+            <tr data-type="both" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">04</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#fffbeb;"><span>💼</span></div>
+                  <div>
+                    <div class="cat-name">Business</div>
+                    <div class="cat-slug">business</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge both"><i class="bi bi-layers-fill"></i> Both</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 37</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 18</span></td>
+              <td><span class="sort-order-badge">4</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 05 DevOps (parent) -->
+            <tr data-type="course" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">05</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#ecfeff;"><span>⚙️</span></div>
+                  <div>
+                    <div class="cat-name">DevOps & Cloud</div>
+                    <div class="cat-slug">devops-cloud</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge course"><i class="bi bi-play-btn-fill"></i> Course</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-play-btn"></i> 29</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 0</span></td>
+              <td><span class="sort-order-badge">5</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 06 Tutorial (blog only) -->
+            <tr data-type="blog" data-status="active">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">06</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#f5f3ff;"><span>📝</span></div>
+                  <div>
+                    <div class="cat-name">Tutorial</div>
+                    <div class="cat-slug">tutorial</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge blog"><i class="bi bi-journal-richtext"></i> Blog</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip"><i class="bi bi-play-btn"></i> 0</span></td>
+              <td><span class="count-chip blue"><i class="bi bi-journal"></i> 34</span></td>
+              <td><span class="sort-order-badge">1</span></td>
+              <td><span class="badge-status active">Aktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 07 Berita (blog only, inactive) -->
+            <tr data-type="blog" data-status="inactive">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">07</span></td>
+              <td>
+                <div class="cat-name-cell">
+                  <div class="cat-icon-box" style="background:#fef2f2;"><span>📰</span></div>
+                  <div>
+                    <div class="cat-name" style="color:var(--text-muted);">Berita & Update</div>
+                    <div class="cat-slug">berita-update</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="type-badge blog"><i class="bi bi-journal-richtext"></i> Blog</span></td>
+              <td><span style="font-size:12.5px;color:var(--text-muted);">— Induk —</span></td>
+              <td><span class="count-chip"><i class="bi bi-play-btn"></i> 0</span></td>
+              <td><span class="count-chip"><i class="bi bi-journal"></i> 7</span></td>
+              <td><span class="sort-order-badge">3</span></td>
+              <td><span class="badge-status inactive">Nonaktif</span></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action sub" title="Tambah sub-kategori"><i class="bi bi-diagram-3-fill"></i></button>
+                  <button class="btn-action edit" title="Edit"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty state row -->
+            <tr id="emptyRow" style="display:none;">
+              <td colspan="9">
+                <div class="empty-state">
+                  <i class="bi bi-tags"></i>
+                  <p>Tidak ada kategori yang cocok dengan filter.</p>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer -->
+      <div class="tbl-footer">
+        <div class="tbl-info">Menampilkan <strong>10</strong> dari <strong>16</strong> kategori (halaman 1)</div>
+        <div class="pagination-custom">
+          <button class="page-btn" disabled><i class="bi bi-chevron-left" style="font-size:11px;"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn"><i class="bi bi-chevron-right" style="font-size:11px;"></i></button>
+        </div>
+      </div>
+
+    </div><!-- /.table-card -->
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-brand">LearnHub</span>
+    <span class="footer-sep">|</span>
+    <span>LMS Platform v2.0</span>
+    <span class="footer-sep">·</span>
+    <span>© 2025 LearnHub. All rights reserved.</span>
+    <div class="footer-right">
+      <a href="#" class="footer-link">Dokumentasi</a>
+      <a href="#" class="footer-link">Bantuan</a>
+      <div style="display:flex;align-items:center;gap:5px;"><span class="status-dot"></span><span>Sistem normal</span></div>
+    </div>
+  </footer>
+
+</div><!-- /.main-area -->
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="bi bi-arrow-up-short" style="font-size:24px;"></i>
+</button>
+
+<!-- ══════════ MODAL TAMBAH KATEGORI ══════════ -->
+<div class="modal-overlay" id="addModal" onclick="handleBackdrop(event)">
+  <div class="modal-box-lg">
+
+    <div class="modal-header-custom">
+      <div class="modal-header-icon"><i class="bi bi-tags-fill"></i></div>
+      <div class="modal-header-text">
+        <h5>Tambah Kategori Baru</h5>
+        <p>Isi detail kategori sesuai struktur database</p>
+      </div>
+      <button class="modal-close" onclick="hideAddModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body-custom">
+      {{-- POST /categories | @csrf --}}
+      <form id="addCatForm" novalidate>
+
+        <!-- ── INFORMASI UTAMA ── -->
+        <div class="section-divider"><span>Informasi Utama</span></div>
+
+        <!-- Nama & Slug -->
+        <div class="form-row-2 form-group-custom">
+          <div>
+            <label class="form-label-custom">
+              Nama Kategori <span class="req">*</span>
+            </label>
+            <div class="input-icon-wrap">
+              <i class="ico bi bi-tag-fill"></i>
+              <input type="text" class="form-input has-icon" id="catName" name="name"
+                placeholder="cth: Web Development" autocomplete="off"
+                oninput="autoSlug(this.value)">
+            </div>
+            <div class="field-error" id="errName">
+              <i class="bi bi-exclamation-circle-fill"></i> Nama kategori wajib diisi
+            </div>
+          </div>
+          <div>
+            <label class="form-label-custom">
+              Slug <span class="req">*</span>
+              <span class="hint">— otomatis dari nama</span>
+            </label>
+            <div class="input-icon-wrap">
+              <i class="ico bi bi-link-45deg"></i>
+              <input type="text" class="form-input has-icon" id="catSlug" name="slug"
+                placeholder="web-development" autocomplete="off"
+                oninput="slugInput(this.value)">
+            </div>
+            <div class="slug-preview">
+              <span class="slug-preview-label">URL:</span>
+              <span class="slug-preview-val" id="slugPreview">/kategori/—</span>
+            </div>
+            <div class="field-error" id="errSlug">
+              <i class="bi bi-exclamation-circle-fill"></i> Slug wajib diisi
+            </div>
+          </div>
+        </div>
+
+        <!-- Deskripsi (nullable) -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">
+            Deskripsi <span class="hint">(opsional)</span>
+          </label>
+          <textarea class="form-textarea" name="description" id="catDesc"
+            placeholder="Tuliskan deskripsi singkat kategori ini..."
+            maxlength="500"></textarea>
+          <div style="font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px;">
+            <span id="descCount">0</span>/500 karakter
+          </div>
+        </div>
+
+        <!-- ── HIERARKI & TIPE ── -->
+        <div class="section-divider"><span>Hierarki &amp; Tipe</span></div>
+
+        <div class="form-row-2 form-group-custom">
+          <!-- parent_id (nullable) -->
+          <div>
+            <label class="form-label-custom">
+              Kategori Induk
+              <span class="hint">(kosongkan jika kategori utama)</span>
+            </label>
+            <select class="form-select" name="parent_id" id="parentId">
+              <option value="">— Tanpa induk (kategori utama) —</option>
+              <option value="1">💻 Programming</option>
+              <option value="2">🎨 Design</option>
+              <option value="3">📊 Data Science</option>
+              <option value="4">💼 Business</option>
+              <option value="5">⚙️ DevOps &amp; Cloud</option>
+              <option value="6">📝 Tutorial</option>
+              <option value="7">📰 Berita &amp; Update</option>
+            </select>
+          </div>
+          <!-- type: course | blog | both -->
+          <div>
+            <label class="form-label-custom">
+              Tipe Kategori <span class="req">*</span>
+            </label>
+            <select class="form-select" name="type" id="catType">
+              <option value="">— Pilih tipe —</option>
+              <option value="course">Course — hanya untuk kursus</option>
+              <option value="blog">Blog — hanya untuk posting blog</option>
+              <option value="both">Both — kursus &amp; blog</option>
+            </select>
+            <div class="field-error" id="errType">
+              <i class="bi bi-exclamation-circle-fill"></i> Tipe kategori wajib dipilih
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TAMPILAN ── -->
+        <div class="section-divider"><span>Tampilan</span></div>
+
+        <!-- Icon picker -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">
+            Icon <span class="hint">(pilih emoji atau ikon)</span>
+          </label>
+          <div class="icon-picker-wrap">
+            <div class="icon-picker-tabs">
+              <button type="button" class="icon-tab active" onclick="switchIconTab(this,'tech')">💻 Teknologi</button>
+              <button type="button" class="icon-tab" onclick="switchIconTab(this,'business')">💼 Bisnis</button>
+              <button type="button" class="icon-tab" onclick="switchIconTab(this,'creative')">🎨 Kreatif</button>
+              <button type="button" class="icon-tab" onclick="switchIconTab(this,'other')">📌 Lainnya</button>
+            </div>
+            <div class="icon-grid" id="iconGrid">
+              <!-- icons rendered per tab -->
+            </div>
+          </div>
+          <input type="hidden" name="icon" id="iconValue" value="💻">
+        </div>
+
+        <!-- Cover image (nullable) -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">
+            Cover Image <span class="hint">(opsional, maks. 2MB — JPG/PNG/WebP)</span>
+          </label>
+          <div class="cover-upload-wrap" onclick="document.getElementById('coverInput').click()">
+            <div class="cover-thumb-empty" id="coverThumbWrap"><span id="coverIconPreview">🖼️</span></div>
+            <div class="cover-info">
+              <h6><i class="bi bi-cloud-arrow-up-fill me-1" style="color:var(--warning);"></i>Unggah Cover</h6>
+              <p>Klik untuk memilih gambar (disarankan 1200×400px)</p>
+            </div>
+          </div>
+          <input type="file" id="coverInput" name="cover_image" accept="image/*" onchange="previewCover(this)">
+        </div>
+
+        <!-- Sort order -->
+        <div class="form-row-2 form-group-custom">
+          <div>
+            <label class="form-label-custom">
+              Urutan Tampil
+              <span class="hint">(sort_order, angka kecil = lebih dulu)</span>
+            </label>
+            <div class="sort-input-wrap">
+              <button type="button" class="sort-btn" onclick="adjustSort(-1)">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+              <input type="number" name="sort_order" id="sortOrder" value="0" min="0" max="9999">
+              <button type="button" class="sort-btn" onclick="adjustSort(1)">
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+            <!-- is_active toggle -->
+            <div class="toggle-row">
+              <div class="toggle-row-info">
+                <h6>Status Aktif</h6>
+                <p>Tampilkan kategori di platform</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" name="is_active" id="toggleActive" checked>
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div><!-- /.modal-body -->
+
+    <div class="modal-footer-custom">
+      <button class="btn-cancel-modal" onclick="hideAddModal()">
+        <i class="bi bi-x-lg me-1"></i> Batal
+      </button>
+      <button class="btn-save-modal" id="btnSaveCat" onclick="submitAddCat()">
+        <span class="btn-save-text"><i class="bi bi-tags me-1"></i> Simpan Kategori</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div><!-- /.modal-box-lg -->
+</div><!-- /#addModal -->
+
+<!-- ══════════ LOGOUT MODAL ══════════ -->
+<div class="modal-overlay" id="logoutModal" onclick="if(event.target===this)hideLogoutModal()">
+  <div class="modal-box-sm">
+    <div class="modal-icon-wrap">
+      <div class="modal-icon-ring"></div>
+      <i class="bi bi-box-arrow-right" style="color:#ef4444;"></i>
+    </div>
+    <h3 class="modal-title">Yakin ingin keluar?</h3>
+    <p class="modal-desc">Anda akan keluar dari sesi aktif LearnHub.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="hideLogoutModal()"><i class="bi bi-x-lg me-1"></i> Batal</button>
+      <button class="btn-modal-confirm" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-1"></i> Ya, Keluar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ─── Sidebar ─── */
+  const sidebar = document.getElementById('sidebar');
+  const mainArea = document.getElementById('mainArea');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+  let sidebarCollapsed = false;
+  const isMobile = () => window.innerWidth < 992;
+
+  function toggleSidebar() {
+    if (isMobile()) {
+      const open = sidebar.classList.contains('mobile-open');
+      if (open) { closeMobileSidebar(); }
+      else { sidebar.classList.add('mobile-open'); backdrop.classList.add('show'); document.body.classList.add('no-scroll'); }
+    } else {
+      sidebarCollapsed = !sidebarCollapsed;
+      sidebar.classList.toggle('collapsed', sidebarCollapsed);
+      mainArea.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+      hamburgerIcon.className = sidebarCollapsed ? 'bi bi-layout-sidebar' : 'bi bi-list';
+    }
+  }
+  function closeMobileSidebar() {
+    sidebar.classList.remove('mobile-open');
+    backdrop.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+  }
+  window.addEventListener('resize', () => { if (!isMobile()) closeMobileSidebar(); });
+  document.querySelectorAll('.nav-link-custom').forEach(l => {
+    l.addEventListener('click', function(e) {
+      if (!this.getAttribute('href') || this.getAttribute('href') === '#') e.preventDefault();
+      document.querySelectorAll('.nav-link-custom').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+      if (isMobile()) closeMobileSidebar();
+    });
+  });
+
+  /* ─── User dropdown ─── */
+  const userTrigger = document.getElementById('userTrigger');
+  const userDropdown = document.getElementById('userDropdown');
+  function toggleUserDropdown() {
+    const open = userDropdown.classList.toggle('open');
+    userTrigger.classList.toggle('open', open);
+  }
+  document.addEventListener('click', e => {
+    if (!userTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+      userDropdown.classList.remove('open'); userTrigger.classList.remove('open');
+    }
+  });
+
+  /* ─── Logout ─── */
+  function showLogoutModal() { userDropdown.classList.remove('open'); userTrigger.classList.remove('open'); document.getElementById('logoutModal').classList.add('show'); }
+  function hideLogoutModal() { document.getElementById('logoutModal').classList.remove('show'); }
+  function confirmLogout() {
+    const b = document.querySelector('#logoutModal .btn-modal-confirm');
+    b.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:14px;height:14px;border-width:2px;"></span>Keluar...';
+    b.disabled = true;
+    setTimeout(() => window.location.href = '/logout', 1400);
+  }
+
+  /* ─── FAB ─── */
+  const fab = document.getElementById('fabBtn');
+  window.addEventListener('scroll', () => fab.classList.toggle('visible', window.scrollY > 180), { passive: true });
+
+  /* ─── Table filter ─── */
+  function filterTable() {
+    const q  = document.getElementById('searchCat').value.toLowerCase();
+    const ty = document.getElementById('filterType').value;
+    const st = document.getElementById('filterStatus').value;
+    const rows = document.querySelectorAll('#catTbody tr:not(#emptyRow)');
+    let visible = 0;
+    rows.forEach(row => {
+      const txt  = row.textContent.toLowerCase();
+      const type = row.dataset.type || '';
+      const status = row.dataset.status || '';
+      const show = (!q || txt.includes(q)) && (!ty || type === ty) && (!st || status === st);
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('emptyRow').style.display = visible === 0 ? '' : 'none';
+  }
+
+  /* ─── Modal ─── */
+  function showAddModal() {
+    document.getElementById('addModal').classList.add('show');
+    document.body.classList.add('no-scroll');
+    renderIconGrid('tech');
+  }
+  function hideAddModal() {
+    document.getElementById('addModal').classList.remove('show');
+    document.body.classList.remove('no-scroll');
+  }
+  function handleBackdrop(e) {
+    if (e.target === document.getElementById('addModal')) hideAddModal();
+  }
+
+  /* ─── Slug auto-generate ─── */
+  function toSlug(str) {
+    return str.toLowerCase()
+      .replace(/[\s_]+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+  function autoSlug(val) {
+    const slug = toSlug(val);
+    document.getElementById('catSlug').value = slug;
+    document.getElementById('slugPreview').textContent = '/kategori/' + (slug || '—');
+    document.getElementById('errName').classList.remove('show');
+    document.getElementById('catName').classList.remove('is-invalid');
+  }
+  function slugInput(val) {
+    const slug = toSlug(val);
+    document.getElementById('catSlug').value = slug;
+    document.getElementById('slugPreview').textContent = '/kategori/' + (slug || '—');
+  }
+
+  /* ─── Desc counter ─── */
+  document.getElementById('catDesc').addEventListener('input', function() {
+    document.getElementById('descCount').textContent = this.value.length;
+  });
+
+  /* ─── Sort order adjust ─── */
+  function adjustSort(delta) {
+    const inp = document.getElementById('sortOrder');
+    inp.value = Math.max(0, parseInt(inp.value || 0) + delta);
+  }
+
+  /* ─── Cover preview ─── */
+  function previewCover(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wrap = document.getElementById('coverThumbWrap');
+      wrap.innerHTML = `<img src="${e.target.result}" class="cover-thumb" alt="cover">`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ─── Icon picker ─── */
+  const ICON_SETS = {
+    tech:     ['💻','🌐','📱','⚙️','🤖','🐍','☁️','🔒','📡','🛠️','🧩','🔧'],
+    business: ['💼','📊','💰','🏢','📈','🎯','📋','🤝','💡','🏆','📣','💳'],
+    creative: ['🎨','✏️','📸','🎬','🎵','🖌️','🎭','✍️','🖊️','🎤','📐','🎞️'],
+    other:    ['📚','📝','🔬','🧪','🌿','⭐','🏅','📌','🔖','🗂️','📰','🧠'],
+  };
+
+  let selectedIcon = '💻';
+
+  function renderIconGrid(tabKey) {
+    const grid = document.getElementById('iconGrid');
+    grid.innerHTML = '';
+    ICON_SETS[tabKey].forEach(ic => {
+      const el = document.createElement('div');
+      el.className = 'icon-opt' + (ic === selectedIcon ? ' selected' : '');
+      el.textContent = ic;
+      el.title = ic;
+      el.onclick = () => selectIcon(el, ic);
+      grid.appendChild(el);
+    });
+  }
+
+  function selectIcon(el, val) {
+    document.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedIcon = val;
+    document.getElementById('iconValue').value = val;
+    document.getElementById('coverIconPreview').textContent = val;
+  }
+
+  function switchIconTab(btn, key) {
+    document.querySelectorAll('.icon-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderIconGrid(key);
+  }
+
+  /* ─── Form validation & submit ─── */
+  async function submitAddCat() {
+    const name  = document.getElementById('catName');
+    const slug  = document.getElementById('catSlug');
+    const type  = document.getElementById('catType');
+    const btn   = document.getElementById('btnSaveCat');
+
+    // reset
+    [name, slug, type].forEach(el => el.classList.remove('is-invalid'));
+    ['errName','errSlug','errType'].forEach(id => document.getElementById(id).classList.remove('show'));
+
+    let valid = true;
+    if (!name.value.trim()) { name.classList.add('is-invalid'); document.getElementById('errName').classList.add('show'); valid = false; }
+    if (!slug.value.trim()) { slug.classList.add('is-invalid'); document.getElementById('errSlug').classList.add('show'); valid = false; }
+    if (!type.value) { type.classList.add('is-invalid'); document.getElementById('errType').classList.add('show'); valid = false; }
+
+    if (!valid) return;
+
+    btn.classList.add('loading'); btn.disabled = true;
+    await new Promise(r => setTimeout(r, 1500));
+    btn.classList.remove('loading'); btn.disabled = false;
+
+    const savedName = name.value.trim();
+    hideAddModal();
+    showToast(`Kategori "${savedName}" berhasil ditambahkan!`, 'success');
+
+    // reset form
+    document.getElementById('addCatForm').reset();
+    document.getElementById('slugPreview').textContent = '/kategori/—';
+    document.getElementById('descCount').textContent = '0';
+    document.getElementById('sortOrder').value = '0';
+    selectedIcon = '💻';
+    document.getElementById('iconValue').value = '💻';
+    document.getElementById('coverThumbWrap').innerHTML = '<span id="coverIconPreview">🖼️</span>';
+  }
+
+  /* ─── Toast ─── */
+  function showToast(msg, type = 'success') {
+    const C = {
+      success:{ bg:'#ecfdf5', color:'#10b981', border:'rgba(16,185,129,.3)', icon:'check-circle-fill' },
+      info:   { bg:'#eff6ff', color:'#2563eb', border:'rgba(37,99,235,.3)',  icon:'info-circle-fill'  },
+      error:  { bg:'#fef2f2', color:'#ef4444', border:'rgba(239,68,68,.3)',  icon:'exclamation-circle-fill' },
+    };
+    const c = C[type] || C.success;
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;top:76px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.12);background:${c.bg};color:${c.color};border:1px solid ${c.border};transform:translateX(120%);transition:transform .35s cubic-bezier(.34,1.4,.64,1);max-width:320px;`;
+    t.innerHTML = `<i class="bi bi-${c.icon}" style="font-size:17px;flex-shrink:0;"></i><span>${msg}</span>`;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.style.transform = 'translateX(0)');
+    setTimeout(() => { t.style.transform = 'translateX(120%)'; setTimeout(() => t.remove(), 380); }, 3400);
+  }
+
+  /* ─── ESC ─── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { hideAddModal(); hideLogoutModal(); }
+  });
+</script>
+</body>
+</html>
