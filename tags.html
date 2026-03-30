@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tags — LearnHub LMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ══════ VARIABLES ══════ */
+    :root{
+      --sidebar-w:260px;--sidebar-w-col:72px;--topbar-h:64px;--footer-h:56px;
+      --primary:#2563eb;--primary-light:#3b82f6;--primary-xlight:#eff6ff;--primary-hover:#1d4ed8;
+      --accent:#06b6d4;--accent-light:#ecfeff;
+      --success:#10b981;--success-light:#ecfdf5;
+      --warning:#f59e0b;--warning-light:#fffbeb;
+      --danger:#ef4444;--danger-light:#fef2f2;
+      --purple:#8b5cf6;--purple-light:#f5f3ff;
+      --indigo:#6366f1;--indigo-light:#eef2ff;
+      --teal:#0d9488;--teal-light:#f0fdfa;
+      --sidebar-bg:#0f172a;--sidebar-text:rgba(226,232,240,.75);--sidebar-text-act:#fff;
+      --sidebar-hover:rgba(255,255,255,.06);--sidebar-active:rgba(37,99,235,.25);--sidebar-border:rgba(255,255,255,.07);
+      --topbar-bg:#fff;--body-bg:#f1f5f9;--card-bg:#fff;
+      --card-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+      --card-shadow-hover:0 4px 12px rgba(37,99,235,.12),0 8px 32px rgba(0,0,0,.1);
+      --border:#e2e8f0;--text-main:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
+      --radius:14px;--radius-sm:8px;
+      --transition:all .25s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{height:100%;scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:var(--body-bg);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+    body.no-scroll{overflow:hidden;}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+    ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+    /* ══════ SIDEBAR ══════ */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;z-index:200;transition:width .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+    .sidebar.collapsed{width:var(--sidebar-w-col);}
+    .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .sidebar-backdrop.show{opacity:1;pointer-events:all;}
+    .sidebar-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 18px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;overflow:hidden;min-height:72px;}
+    .brand-icon-wrap{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,99,235,.4);cursor:pointer;position:relative;overflow:hidden;}
+    .brand-icon-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.25),transparent 70%);opacity:0;transition:opacity .3s;}
+    .brand-icon-wrap:hover::after{opacity:1;}
+    .brand-icon-wrap i{color:#fff;font-size:18px;animation:iconFloat 3s ease-in-out infinite;}
+    @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0deg);}30%{transform:translateY(-2px) rotate(-5deg);}60%{transform:translateY(1px) rotate(3deg);}}
+    .brand-text-wrap{overflow:hidden;white-space:nowrap;transition:opacity .2s,width .28s;}
+    .brand-name{font-size:16px;font-weight:700;letter-spacing:-.3px;line-height:1.1;background:linear-gradient(135deg,#fff,#7dd3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .brand-version{font-size:10.5px;color:rgba(148,163,184,.7);font-weight:400;letter-spacing:.3px;margin-top:1px;}
+    .sidebar.collapsed .brand-text-wrap{opacity:0;pointer-events:none;width:0;}
+    .sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+    .sidebar-nav::-webkit-scrollbar{width:3px;}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+    .nav-category{font-size:9.5px;font-weight:600;color:rgba(148,163,184,.5);letter-spacing:1.2px;text-transform:uppercase;padding:14px 20px 5px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+    .sidebar.collapsed .nav-category{opacity:0;}
+    .nav-item-wrap{padding:2px 10px;}
+    .nav-link-custom{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--sidebar-text);text-decoration:none;font-size:13.5px;font-weight:500;transition:var(--transition);position:relative;overflow:hidden;white-space:nowrap;}
+    .nav-link-custom .nav-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.06);transition:var(--transition);}
+    .nav-link-custom:hover{background:var(--sidebar-hover);color:var(--sidebar-text-act);}
+    .nav-link-custom:hover .nav-icon{background:rgba(59,130,246,.2);color:var(--primary-light);}
+    .nav-link-custom.active{background:var(--sidebar-active);color:var(--sidebar-text-act);}
+    .nav-link-custom.active .nav-icon{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.45);}
+    .nav-link-custom.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--primary-light);border-radius:0 3px 3px 0;}
+    .nav-label{transition:opacity .2s,width .28s;}
+    .sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden;}
+    .nav-badge{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;transition:opacity .2s;}
+    .nav-badge.blue{background:rgba(59,130,246,.2);color:#93c5fd;}
+    .nav-badge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
+    .nav-badge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+    .sidebar.collapsed .nav-badge{opacity:0;width:0;overflow:hidden;}
+    .sidebar.collapsed .nav-link-custom{justify-content:center;padding:10px;}
+    .sidebar.collapsed .nav-link-custom .nav-icon{background:transparent;}
+    .sidebar-footer{padding:12px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:var(--transition);overflow:hidden;}
+    .sidebar-user:hover{background:var(--sidebar-hover);}
+    .sidebar-user-avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+    .sidebar-user-info{overflow:hidden;}
+    .sidebar-user-name{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sidebar-user-role{font-size:10.5px;color:rgba(148,163,184,.6);}
+    .sidebar.collapsed .sidebar-user-info{display:none;}
+    @media(min-width:992px){
+      .sidebar.collapsed .nav-link-custom{position:relative;}
+      .sidebar.collapsed .nav-link-custom::after{content:attr(data-label);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--text-main);color:#fff;font-size:12px;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;}
+      .sidebar.collapsed .nav-link-custom:hover::after{opacity:1;}
+    }
+
+    /* ══════ MAIN ══════ */
+    .main-area{flex:1;margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;transition:margin-left .28s cubic-bezier(.4,0,.2,1);}
+    .main-area.sidebar-collapsed{margin-left:var(--sidebar-w-col);}
+
+    /* ══════ TOPBAR ══════ */
+    .topbar{position:sticky;top:0;z-index:100;height:var(--topbar-h);background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .hamburger{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:18px;transition:var(--transition);}
+    .hamburger:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-search{flex:1;max-width:360px;position:relative;}
+    .topbar-search input{width:100%;padding:9px 14px 9px 38px;border-radius:10px;border:1.5px solid var(--border);background:var(--body-bg);color:var(--text-main);font-family:'Poppins',sans-serif;font-size:13px;outline:none;transition:var(--transition);}
+    .topbar-search input::placeholder{color:var(--text-muted);}
+    .topbar-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+    .topbar-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;}
+    .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+    .topbar-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:17px;transition:var(--transition);position:relative;}
+    .topbar-btn:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-notif-dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;animation:dotPulse 2s ease-in-out infinite;}
+    @keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+    .user-trigger{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:12px;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:var(--transition);position:relative;}
+    .user-trigger:hover{background:var(--primary-xlight);border-color:var(--primary-light);}
+    .user-ava-sm{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+    .user-meta-name{font-size:12.5px;font-weight:600;color:var(--text-main);line-height:1.2;white-space:nowrap;}
+    .user-meta-email{font-size:10.5px;color:var(--text-muted);white-space:nowrap;}
+    .user-trigger i.chevron{font-size:13px;color:var(--text-muted);margin-left:2px;transition:transform .2s;}
+    .user-trigger.open i.chevron{transform:rotate(180deg);}
+    .user-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:240px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);z-index:300;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);transform-origin:top right;transition:opacity .2s,transform .2s;}
+    .user-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .dropdown-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .dropdown-avatar{width:40px;height:40px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
+    .dd-name{font-size:13.5px;font-weight:600;color:var(--text-main);}
+    .dd-email{font-size:11.5px;color:var(--text-muted);}
+    .dd-badge{display:inline-block;margin-top:3px;padding:1px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--primary-xlight);color:var(--primary);}
+    .dropdown-menu-list{padding:6px;}
+    .dd-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13px;font-weight:500;color:var(--text-main);cursor:pointer;transition:var(--transition);text-decoration:none;}
+    .dd-item:hover{background:var(--primary-xlight);color:var(--primary);}
+    .dd-item i{font-size:15px;color:var(--text-secondary);width:20px;}
+    .dd-item:hover i{color:var(--primary);}
+    .dd-divider{height:1px;background:var(--border);margin:4px 6px;}
+    .dd-item.logout{color:var(--danger);}
+    .dd-item.logout i{color:var(--danger);}
+    .dd-item.logout:hover{background:var(--danger-light);}
+
+    /* ══════ CONTENT ══════ */
+    .content-area{flex:1;padding:24px;min-height:calc(100vh - var(--topbar-h) - var(--footer-h));}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px;}
+    .page-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:var(--text-main);letter-spacing:-.3px;}
+    .page-title-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;background:linear-gradient(135deg,var(--teal),#2dd4bf);box-shadow:0 4px 12px rgba(13,148,136,.3);}
+    .page-desc{font-size:13px;color:var(--text-muted);margin-top:4px;}
+    .breadcrumb-wrap{display:flex;align-items:center;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px 14px;gap:6px;font-size:13px;}
+    .breadcrumb-wrap i.home{color:var(--primary);font-size:15px;}
+    .breadcrumb-sep{color:var(--text-muted);}
+    .breadcrumb-cur{color:var(--primary);font-weight:600;}
+    .breadcrumb-past{color:var(--text-secondary);text-decoration:none;transition:color .2s;}
+    .breadcrumb-past:hover{color:var(--primary);}
+
+    /* ══════ STATS ══════ */
+    .stats-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
+    .stat-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 18px;box-shadow:var(--card-shadow);flex:1;min-width:140px;transition:var(--transition);animation:fadeInUp .4s ease both;}
+    .stat-pill:hover{box-shadow:var(--card-shadow-hover);transform:translateY(-1px);}
+    .stat-pill:nth-child(2){animation-delay:.05s;}
+    .stat-pill:nth-child(3){animation-delay:.1s;}
+    .stat-pill:nth-child(4){animation-delay:.15s;}
+    .stat-pill-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .stat-pill-val{font-size:18px;font-weight:700;line-height:1;}
+    .stat-pill-lbl{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ══════ TABLE CARD ══════ */
+    .table-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px;animation:fadeInUp .4s ease both;}
+    .table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+    .table-toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .table-toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .toolbar-title{font-size:14.5px;font-weight:700;color:var(--text-main);}
+    .toolbar-count{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid rgba(13,148,136,.2);}
+
+    .tbl-search{position:relative;}
+    .tbl-search input{padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);transition:var(--transition);width:200px;}
+    .tbl-search input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);width:240px;}
+    .tbl-search input::placeholder{color:var(--text-muted);}
+    .tbl-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none;}
+
+    .tbl-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);outline:none;background:var(--body-bg);cursor:pointer;transition:var(--transition);}
+    .tbl-filter:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+
+    .btn-tambah{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#2dd4bf);color:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(13,148,136,.3);white-space:nowrap;}
+    .btn-tambah:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,148,136,.4);}
+    .btn-tambah:active{transform:translateY(0);}
+
+    .btn-export{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text-secondary);font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:var(--transition);white-space:nowrap;}
+    .btn-export:hover{border-color:var(--primary-light);color:var(--primary);background:var(--primary-xlight);}
+
+    /* Table */
+    .table-wrap{overflow-x:auto;}
+    .tbl{width:100%;border-collapse:collapse;min-width:700px;}
+    .tbl thead th{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap;}
+    .tbl tbody tr{transition:background .15s;}
+    .tbl tbody tr:hover td{background:#f8fafc;}
+    .tbl tbody td{padding:13px 16px;font-size:13.5px;color:var(--text-main);vertical-align:middle;border-bottom:1px solid #f1f5f9;}
+    .tbl tbody tr:last-child td{border-bottom:none;}
+
+    /* Tag pill preview */
+    .tag-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;border:1.5px solid transparent;}
+    .tag-slug{font-size:11.5px;color:var(--text-muted);font-family:'Courier New',monospace;background:#f1f5f9;padding:2px 7px;border-radius:5px;margin-top:2px;display:inline-block;}
+
+    /* Usage chips */
+    .usage-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;}
+    .usage-chip.course{background:var(--primary-xlight);color:var(--primary);}
+    .usage-chip.post{background:var(--purple-light);color:var(--purple);}
+    .usage-chip.zero{background:#f1f5f9;color:var(--text-muted);}
+
+    /* ULID cell */
+    .ulid-cell{font-family:'Courier New',monospace;font-size:11px;color:var(--text-muted);letter-spacing:.3px;}
+
+    /* Date cell */
+    .date-cell{font-size:12.5px;color:var(--text-secondary);}
+    .date-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+
+    /* Action buttons */
+    .action-cell{display:flex;align-items:center;gap:6px;}
+    .btn-action{width:32px;height:32px;border-radius:8px;border:none;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:var(--transition);}
+    .btn-action.view{background:var(--primary-xlight);color:var(--primary);}
+    .btn-action.view:hover{background:var(--primary);color:#fff;}
+    .btn-action.edit{background:#f0fdf4;color:var(--success);}
+    .btn-action.edit:hover{background:var(--success);color:#fff;}
+    .btn-action.del{background:var(--danger-light);color:var(--danger);}
+    .btn-action.del:hover{background:var(--danger);color:#fff;}
+
+    /* Pagination */
+    .tbl-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .tbl-info{font-size:12.5px;color:var(--text-muted);}
+    .pagination-custom{display:flex;gap:4px;}
+    .page-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text-secondary);font-size:13px;font-family:'Poppins',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-weight:500;}
+    .page-btn:hover{background:var(--primary-xlight);border-color:var(--primary-light);color:var(--primary);}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3);}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+    /* Empty */
+    .empty-state{padding:48px 20px;text-align:center;}
+    .empty-state i{font-size:44px;color:var(--text-muted);margin-bottom:12px;display:block;}
+    .empty-state p{font-size:14px;color:var(--text-muted);}
+
+    /* ══════ MODAL ══════ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .modal-overlay.show{opacity:1;pointer-events:all;}
+
+    /* Add Tag Modal */
+    .modal-box-md{background:#fff;border-radius:20px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:scale(.94) translateY(20px);transition:transform .3s cubic-bezier(.34,1.4,.64,1);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+    .modal-overlay.show .modal-box-md{transform:scale(1) translateY(0);}
+
+    .modal-header-custom{display:flex;align-items:center;gap:14px;padding:22px 24px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .modal-header-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--teal),#2dd4bf);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 12px rgba(13,148,136,.35);animation:headerBob 2.5s ease-in-out infinite;}
+    @keyframes headerBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+    .modal-header-text h5{font-size:16px;font-weight:700;color:var(--text-main);margin:0;}
+    .modal-header-text p{font-size:12.5px;color:var(--text-muted);margin:2px 0 0;}
+    .modal-close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:none;background:var(--body-bg);color:var(--text-secondary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
+    .modal-close:hover{background:var(--danger-light);color:var(--danger);}
+
+    .modal-body-custom{padding:22px 24px;overflow-y:auto;flex:1;}
+    .modal-body-custom::-webkit-scrollbar{width:4px;}
+    .modal-body-custom::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+
+    /* Form */
+    .form-group-custom{margin-bottom:18px;}
+    .form-label-custom{font-size:12.5px;font-weight:600;color:var(--text-main);margin-bottom:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+    .form-label-custom .req{color:var(--danger);}
+    .form-label-custom .hint{font-size:11px;color:var(--text-muted);font-weight:400;}
+
+    .input-icon-wrap{position:relative;}
+    .input-icon-wrap i.ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:15px;pointer-events:none;transition:color .2s;}
+    .input-icon-wrap:focus-within i.ico{color:var(--teal);}
+
+    .form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;}
+    .form-input.has-icon{padding-left:38px;}
+    .form-input::placeholder{color:var(--text-muted);}
+    .form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.12);}
+    .form-input.is-invalid{border-color:var(--danger);background:rgba(239,68,68,.03);}
+    .form-input.is-invalid:focus{box-shadow:0 0 0 3px rgba(239,68,68,.12);}
+
+    .field-error{font-size:11.5px;color:var(--danger);margin-top:5px;display:none;align-items:center;gap:4px;}
+    .field-error.show{display:flex;}
+
+    /* Slug preview */
+    .slug-preview{display:flex;align-items:center;gap:8px;margin-top:7px;padding:7px 12px;background:#f0fdfa;border:1px solid rgba(13,148,136,.2);border-radius:8px;}
+    .slug-preview-label{font-size:11px;color:var(--teal);font-weight:600;flex-shrink:0;}
+    .slug-preview-val{font-size:12px;font-family:'Courier New',monospace;color:var(--teal);font-weight:600;}
+
+    /* Live tag preview */
+    .tag-preview-box{padding:16px;background:linear-gradient(135deg,#f0fdfa,#f8fafc);border:1.5px solid rgba(13,148,136,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:80px;}
+    .tag-preview-label{font-size:11px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.6px;}
+
+    /* Color palette */
+    .color-palette{display:flex;flex-wrap:wrap;gap:8px;}
+    .color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2.5px solid transparent;transition:var(--transition);display:flex;align-items:center;justify-content:center;position:relative;}
+    .color-swatch:hover{transform:scale(1.15);border-color:rgba(0,0,0,.15);}
+    .color-swatch.active{border-color:var(--text-main);transform:scale(1.1);}
+    .color-swatch.active::after{content:'✓';position:absolute;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);}
+
+    /* Bulk input (add multiple tags) */
+    .bulk-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;resize:vertical;min-height:90px;line-height:1.6;}
+    .bulk-input::placeholder{color:var(--text-muted);}
+    .bulk-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.12);}
+    .bulk-tags-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:28px;}
+
+    /* Mode tabs */
+    .mode-tabs{display:flex;background:var(--body-bg);border:1.5px solid var(--border);border-radius:10px;padding:4px;gap:4px;margin-bottom:20px;}
+    .mode-tab{flex:1;padding:8px 12px;border-radius:7px;border:none;background:transparent;font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px;}
+    .mode-tab.active{background:#fff;color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.1);font-weight:600;}
+
+    .mode-panel{display:none;}
+    .mode-panel.active{display:block;}
+
+    /* Section divider */
+    .section-divider{display:flex;align-items:center;gap:10px;margin:20px 0 14px;}
+    .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .section-divider span{font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap;}
+
+    /* Char counter */
+    .char-counter{font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px;}
+    .char-counter.warn{color:var(--warning);}
+    .char-counter.over{color:var(--danger);}
+
+    .modal-footer-custom{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;background:#fafafa;}
+    .btn-cancel-modal{padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-cancel-modal:hover{background:var(--body-bg);}
+    .btn-save-modal{padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#2dd4bf);color:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(13,148,136,.3);display:flex;align-items:center;gap:7px;}
+    .btn-save-modal:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,148,136,.4);}
+    .btn-save-modal:active{transform:translateY(0);}
+    .btn-spinner{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    .btn-save-modal.loading .btn-save-text{display:none;}
+    .btn-save-modal.loading .btn-spinner{display:inline-block;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ══════ LOGOUT MODAL ══════ */
+    .modal-box-sm{background:#fff;border-radius:20px;width:100%;max-width:400px;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.92) translateY(16px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+    .modal-overlay.show .modal-box-sm{transform:scale(1) translateY(0);}
+    .modal-icon-wrap{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:var(--danger-light);border:2px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;animation:modalFloat 2.5s ease-in-out infinite;}
+    @keyframes modalFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-4px) rotate(-5deg);}}
+    .modal-icon-ring{position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(239,68,68,.2);animation:ringRotate 6s linear infinite;}
+    @keyframes ringRotate{to{transform:rotate(360deg);}}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text-main);}
+    .modal-desc{font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px;}
+    .modal-actions{display:flex;gap:10px;}
+    .btn-modal-cancel{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--border);background:transparent;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-modal-cancel:hover{background:var(--body-bg);}
+    .btn-modal-confirm{flex:1;padding:11px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#f87171);font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:#fff;cursor:pointer;transition:var(--transition);box-shadow:0 4px 14px rgba(239,68,68,.35);}
+    .btn-modal-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.45);}
+
+    /* ══════ FOOTER ══════ */
+    .footer{height:var(--footer-h);background:#fff;border-top:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;font-size:12.5px;color:var(--text-muted);flex-shrink:0;}
+    .footer-brand{font-weight:700;color:var(--primary);}
+    .footer-sep{color:var(--border);}
+    .footer-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+    .footer-link{color:var(--text-muted);text-decoration:none;transition:color .2s;}
+    .footer-link:hover{color:var(--primary);}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:dotPulse 2s infinite;}
+
+    /* ══════ FAB ══════ */
+    .fab{position:fixed;bottom:28px;right:28px;z-index:150;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.4);transition:var(--transition);opacity:0;pointer-events:none;transform:translateY(16px) scale(.9);}
+    .fab.visible{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+    .fab:hover{transform:translateY(-3px) scale(1.08);box-shadow:0 10px 28px rgba(37,99,235,.5);}
+
+    /* ══════ RESPONSIVE ══════ */
+    @media(max-width:991px){
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;}
+      .sidebar.mobile-open{transform:translateX(0);}
+      .main-area{margin-left:0!important;}
+      .topbar-search{display:none;}
+    }
+    @media(max-width:767px){
+      .content-area{padding:16px;}
+      .topbar{padding:0 16px;gap:8px;}
+      .page-header{flex-direction:column;}
+      .stats-row{gap:10px;}
+      .stat-pill{min-width:calc(50% - 5px);}
+      .user-meta-name,.user-meta-email{display:none;}
+      .fab{bottom:20px;right:14px;}
+      .footer{padding:0 16px;}
+      .footer-right{display:none;}
+    }
+    @media(max-width:575px){
+      .table-toolbar{flex-direction:column;align-items:stretch;}
+      .table-toolbar-right{flex-wrap:wrap;}
+      .tbl-search input,.tbl-search input:focus{width:100%;}
+      .btn-tambah,.btn-export{flex:1;justify-content:center;}
+      .modal-box-md{max-width:100%;border-radius:20px 20px 0 0;max-height:95vh;position:fixed;bottom:0;left:0;right:0;}
+      .modal-overlay{align-items:flex-end;padding:0;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- ══════ SIDEBAR ══════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon-wrap"><i class="bi bi-mortarboard-fill"></i></div>
+    <div class="brand-text-wrap">
+      <div class="brand-name">LearnHub</div>
+      <div class="brand-version">LMS Platform v2.0</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-category">Overview</div>
+    <div class="nav-item-wrap">
+      <a href="dashboard.html" class="nav-link-custom" data-label="Dashboard">
+        <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Analitik">
+        <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
+        <span class="nav-label">Analitik</span>
+        <span class="nav-badge blue">Baru</span>
+      </a>
+    </div>
+    <div class="nav-category">Master Data</div>
+    <div class="nav-item-wrap">
+      <a href="categories.html" class="nav-link-custom" data-label="Kategori">
+        <span class="nav-icon"><i class="bi bi-tags-fill"></i></span>
+        <span class="nav-label">Kategori</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom active" data-label="Tags">
+        <span class="nav-icon"><i class="bi bi-hash"></i></span>
+        <span class="nav-label">Tags</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="users.html" class="nav-link-custom" data-label="Pengguna">
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+        <span class="nav-label">Pengguna</span>
+        <span class="nav-badge green">284</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="roles.html" class="nav-link-custom" data-label="Role & Izin">
+        <span class="nav-icon"><i class="bi bi-shield-lock-fill"></i></span>
+        <span class="nav-label">Role & Izin</span>
+      </a>
+    </div>
+    <div class="nav-category">Akademik</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kursus">
+        <span class="nav-icon"><i class="bi bi-play-btn-fill"></i></span>
+        <span class="nav-label">Kursus</span>
+        <span class="nav-badge blue">380</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Instruktur">
+        <span class="nav-icon"><i class="bi bi-person-workspace"></i></span>
+        <span class="nav-label">Instruktur</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kuis">
+        <span class="nav-icon"><i class="bi bi-patch-question-fill"></i></span>
+        <span class="nav-label">Kuis</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Sertifikat">
+        <span class="nav-icon"><i class="bi bi-award-fill"></i></span>
+        <span class="nav-label">Sertifikat</span>
+      </a>
+    </div>
+    <div class="nav-category">Transaksi</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pesanan">
+        <span class="nav-icon"><i class="bi bi-bag-fill"></i></span>
+        <span class="nav-label">Pesanan</span>
+        <span class="nav-badge red">5</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Kupon">
+        <span class="nav-icon"><i class="bi bi-ticket-perforated-fill"></i></span>
+        <span class="nav-label">Kupon</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pembayaran">
+        <span class="nav-icon"><i class="bi bi-credit-card-2-front-fill"></i></span>
+        <span class="nav-label">Pembayaran</span>
+      </a>
+    </div>
+    <div class="nav-category">Konten</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Blog">
+        <span class="nav-icon"><i class="bi bi-journal-richtext"></i></span>
+        <span class="nav-label">Blog</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Komentar">
+        <span class="nav-icon"><i class="bi bi-chat-dots-fill"></i></span>
+        <span class="nav-label">Komentar</span>
+        <span class="nav-badge red">12</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Media">
+        <span class="nav-icon"><i class="bi bi-images"></i></span>
+        <span class="nav-label">Media</span>
+      </a>
+    </div>
+    <div class="nav-category">Sistem</div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Pengaturan">
+        <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
+        <span class="nav-label">Pengaturan</span>
+      </a>
+    </div>
+    <div class="nav-item-wrap">
+      <a href="#" class="nav-link-custom" data-label="Log Aktivitas">
+        <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
+        <span class="nav-label">Log Aktivitas</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Ahmad Santoso</div>
+        <div class="sidebar-user-role">Administrator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════ MAIN ══════ -->
+<div class="main-area" id="mainArea">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+      <i class="bi bi-list" id="hamburgerIcon"></i>
+    </button>
+    <div class="topbar-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Cari menu, tag, kursus...">
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn"><i class="bi bi-bell-fill"></i><span class="topbar-notif-dot"></span></button>
+      <button class="topbar-btn"><i class="bi bi-sun-fill"></i></button>
+      <div style="position:relative;">
+        <div class="user-trigger" id="userTrigger" onclick="toggleUserDropdown()">
+          <div class="user-ava-sm">A</div>
+          <div>
+            <div class="user-meta-name">Ahmad Santoso</div>
+            <div class="user-meta-email">ahmad@learnhub.id</div>
+          </div>
+          <i class="bi bi-chevron-down chevron"></i>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">A</div>
+            <div>
+              <div class="dd-name">Ahmad Santoso</div>
+              <div class="dd-email">ahmad@learnhub.id</div>
+              <span class="dd-badge">Administrator</span>
+            </div>
+          </div>
+          <div class="dropdown-menu-list">
+            <a href="#" class="dd-item"><i class="bi bi-person-fill"></i> Profil Saya</a>
+            <a href="#" class="dd-item"><i class="bi bi-gear-fill"></i> Pengaturan Akun</a>
+            <a href="#" class="dd-item"><i class="bi bi-bell-fill"></i> Notifikasi <span class="nav-badge red ms-auto">3</span></a>
+            <div class="dd-divider"></div>
+            <div class="dd-item logout" onclick="showLogoutModal()"><i class="bi bi-box-arrow-right"></i> Keluar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content-area" id="contentArea">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">
+          <div class="page-title-icon"><i class="bi bi-hash"></i></div>
+          Tags
+        </div>
+        <div class="page-desc">Kelola tag untuk mengelompokkan kursus dan artikel blog secara fleksibel.</div>
+      </div>
+      <div class="breadcrumb-wrap">
+        <i class="bi bi-house-door-fill home"></i>
+        <span class="breadcrumb-sep">/</span>
+        <a href="dashboard.html" class="breadcrumb-past">Dashboard</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="#" class="breadcrumb-past">Master Data</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-cur">Tags</span>
+      </div>
+    </div>
+
+    <!-- Stat Pills -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--teal-light);color:var(--teal);"><i class="bi bi-hash"></i></div>
+        <div>
+          <div class="stat-pill-val">64</div>
+          <div class="stat-pill-lbl">Total Tag</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--primary-xlight);color:var(--primary);"><i class="bi bi-play-btn-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">847</div>
+          <div class="stat-pill-lbl">Dipakai di Kursus</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--purple-light);color:var(--purple);"><i class="bi bi-journal-richtext"></i></div>
+        <div>
+          <div class="stat-pill-val">213</div>
+          <div class="stat-pill-lbl">Dipakai di Blog</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon" style="background:var(--danger-light);color:var(--danger);"><i class="bi bi-x-circle-fill"></i></div>
+        <div>
+          <div class="stat-pill-val">5</div>
+          <div class="stat-pill-lbl">Tidak Dipakai</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="table-toolbar-left">
+          <span class="toolbar-title">Daftar Tags</span>
+          <span class="toolbar-count">64 tag</span>
+        </div>
+        <div class="table-toolbar-right">
+          <div class="tbl-search">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Cari nama / slug..." id="searchTag" oninput="filterTable()">
+          </div>
+          <select class="tbl-filter" id="filterUsage" onchange="filterTable()">
+            <option value="">Semua penggunaan</option>
+            <option value="course">Dipakai di kursus</option>
+            <option value="post">Dipakai di blog</option>
+            <option value="unused">Tidak dipakai</option>
+          </select>
+          <button class="btn-export" onclick="showToast('Mengekspor data...','info')">
+            <i class="bi bi-download"></i> Export
+          </button>
+          <button class="btn-tambah" onclick="showAddModal()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Tambah Tag</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="tbl" id="tagTable">
+          <thead>
+            <tr>
+              <th style="width:44px;">#</th>
+              <th>Tag</th>
+              <th>ID (ULID)</th>
+              <th>Dipakai di Kursus</th>
+              <th>Dipakai di Blog</th>
+              <th>Dibuat</th>
+              <th>Diperbarui</th>
+              <th style="width:110px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tagTbody">
+
+            <!-- 01 laravel -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">01</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca;">#&nbsp;laravel</span>
+                  <div class="tag-slug">laravel</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W1X</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 48 kursus</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-journal"></i> 0 post</span></td>
+              <td><div class="date-cell">12 Jan 2025<div class="date-sub">10:24 WIB</div></div></td>
+              <td><div class="date-cell">5 Mar 2025<div class="date-sub">14:10 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 02 javascript -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">02</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#fef9c3;color:#854d0e;border-color:#fde68a;">#&nbsp;javascript</span>
+                  <div class="tag-slug">javascript</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W2Y</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 62 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 14 post</span></td>
+              <td><div class="date-cell">12 Jan 2025<div class="date-sub">10:25 WIB</div></div></td>
+              <td><div class="date-cell">1 Apr 2025<div class="date-sub">09:00 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 03 python -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">03</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;">#&nbsp;python</span>
+                  <div class="tag-slug">python</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W3Z</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 55 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 8 post</span></td>
+              <td><div class="date-cell">12 Jan 2025<div class="date-sub">10:26 WIB</div></div></td>
+              <td><div class="date-cell">20 Mar 2025<div class="date-sub">11:30 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 04 flutter -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">04</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#ecfeff;color:#0e7490;border-color:#a5f3fc;">#&nbsp;flutter</span>
+                  <div class="tag-slug">flutter</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W4A</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 42 kursus</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-journal"></i> 0 post</span></td>
+              <td><div class="date-cell">13 Jan 2025<div class="date-sub">08:15 WIB</div></div></td>
+              <td><div class="date-cell">13 Jan 2025<div class="date-sub">08:15 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 05 react -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">05</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#ede9fe;color:#6d28d9;border-color:#c4b5fd;">#&nbsp;react</span>
+                  <div class="tag-slug">react</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W5B</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 38 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 6 post</span></td>
+              <td><div class="date-cell">14 Jan 2025<div class="date-sub">09:00 WIB</div></div></td>
+              <td><div class="date-cell">2 Mar 2025<div class="date-sub">16:44 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 06 ui-ux (blog) -->
+            <tr data-usage="post">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">06</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#fdf4ff;color:#7e22ce;border-color:#e9d5ff;">#&nbsp;ui-ux</span>
+                  <div class="tag-slug">ui-ux</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W6C</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 22 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 31 post</span></td>
+              <td><div class="date-cell">15 Jan 2025<div class="date-sub">11:30 WIB</div></div></td>
+              <td><div class="date-cell">10 Apr 2025<div class="date-sub">13:20 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 07 tips-trick (blog only) -->
+            <tr data-usage="post">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">07</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#fff7ed;color:#c2410c;border-color:#fed7aa;">#&nbsp;tips-trick</span>
+                  <div class="tag-slug">tips-trick</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W7D</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-play-btn"></i> 0 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 19 post</span></td>
+              <td><div class="date-cell">16 Jan 2025<div class="date-sub">14:00 WIB</div></div></td>
+              <td><div class="date-cell">16 Jan 2025<div class="date-sub">14:00 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 08 machine-learning -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">08</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#ecfdf5;color:#065f46;border-color:#a7f3d0;">#&nbsp;machine-learning</span>
+                  <div class="tag-slug">machine-learning</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W8E</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 29 kursus</span></td>
+              <td><span class="usage-chip post"><i class="bi bi-journal-richtext"></i> 5 post</span></td>
+              <td><div class="date-cell">18 Jan 2025<div class="date-sub">09:45 WIB</div></div></td>
+              <td><div class="date-cell">25 Feb 2025<div class="date-sub">10:15 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 09 docker (unused) -->
+            <tr data-usage="unused">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">09</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#f1f5f9;color:#475569;border-color:#e2e8f0;">#&nbsp;docker</span>
+                  <div class="tag-slug">docker</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W9F</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-play-btn"></i> 0 kursus</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-journal"></i> 0 post</span></td>
+              <td><div class="date-cell">20 Jan 2025<div class="date-sub">16:00 WIB</div></div></td>
+              <td><div class="date-cell">20 Jan 2025<div class="date-sub">16:00 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag" style="background:#fef2f2;color:var(--danger);"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 10 vue-js -->
+            <tr data-usage="course">
+              <td><span style="font-size:12.5px;color:var(--text-muted);font-weight:600;">10</span></td>
+              <td>
+                <div>
+                  <span class="tag-pill" style="background:#ecfdf5;color:#15803d;border-color:#bbf7d0;">#&nbsp;vue-js</span>
+                  <div class="tag-slug">vue-js</div>
+                </div>
+              </td>
+              <td><span class="ulid-cell">01HXKM2N3P4Q5R6S7T8U9V0W0G</span></td>
+              <td><span class="usage-chip course"><i class="bi bi-play-btn-fill"></i> 18 kursus</span></td>
+              <td><span class="usage-chip zero"><i class="bi bi-journal"></i> 0 post</span></td>
+              <td><div class="date-cell">22 Jan 2025<div class="date-sub">13:10 WIB</div></div></td>
+              <td><div class="date-cell">22 Jan 2025<div class="date-sub">13:10 WIB</div></div></td>
+              <td>
+                <div class="action-cell">
+                  <button class="btn-action view" title="Lihat detail"><i class="bi bi-eye-fill"></i></button>
+                  <button class="btn-action edit" title="Edit tag"><i class="bi bi-pencil-fill"></i></button>
+                  <button class="btn-action del" title="Hapus tag"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty state -->
+            <tr id="emptyRow" style="display:none;">
+              <td colspan="8">
+                <div class="empty-state">
+                  <i class="bi bi-hash"></i>
+                  <p>Tidak ada tag yang cocok dengan pencarian.</p>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer -->
+      <div class="tbl-footer">
+        <div class="tbl-info">Menampilkan <strong>1–10</strong> dari <strong>64</strong> tag</div>
+        <div class="pagination-custom">
+          <button class="page-btn" disabled><i class="bi bi-chevron-double-left" style="font-size:10px;"></i></button>
+          <button class="page-btn" disabled><i class="bi bi-chevron-left" style="font-size:11px;"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="display:flex;align-items:center;padding:0 4px;color:var(--text-muted);font-size:13px;">…</span>
+          <button class="page-btn">7</button>
+          <button class="page-btn"><i class="bi bi-chevron-right" style="font-size:11px;"></i></button>
+          <button class="page-btn"><i class="bi bi-chevron-double-right" style="font-size:10px;"></i></button>
+        </div>
+      </div>
+
+    </div><!-- /.table-card -->
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span class="footer-brand">LearnHub</span>
+    <span class="footer-sep">|</span>
+    <span>LMS Platform v2.0</span>
+    <span class="footer-sep">·</span>
+    <span>© 2025 LearnHub. All rights reserved.</span>
+    <div class="footer-right">
+      <a href="#" class="footer-link">Dokumentasi</a>
+      <a href="#" class="footer-link">Bantuan</a>
+      <div style="display:flex;align-items:center;gap:5px;"><span class="status-dot"></span><span>Sistem normal</span></div>
+    </div>
+  </footer>
+
+</div><!-- /.main-area -->
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="bi bi-arrow-up-short" style="font-size:24px;"></i>
+</button>
+
+<!-- ══════ MODAL TAMBAH TAG ══════ -->
+<div class="modal-overlay" id="addModal" onclick="handleBackdrop(event)">
+  <div class="modal-box-md">
+
+    <div class="modal-header-custom">
+      <div class="modal-header-icon"><i class="bi bi-hash"></i></div>
+      <div class="modal-header-text">
+        <h5>Tambah Tag Baru</h5>
+        <p>Tag dipakai di kursus &amp; blog — field sesuai schema database</p>
+      </div>
+      <button class="modal-close" onclick="hideAddModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body-custom">
+
+      <!-- Mode: Satu / Banyak -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="switchMode(this,'single')">
+          <i class="bi bi-tag-fill"></i> Tambah Satu
+        </button>
+        <button class="mode-tab" onclick="switchMode(this,'bulk')">
+          <i class="bi bi-tags-fill"></i> Tambah Banyak
+        </button>
+      </div>
+
+      <!-- ── PANEL SINGLE ── -->
+      <div class="mode-panel active" id="panel-single">
+        {{-- POST /tags | @csrf --}}
+        <form id="addTagForm" novalidate>
+
+          <!-- name -->
+          <div class="form-group-custom">
+            <label class="form-label-custom">
+              Nama Tag <span class="req">*</span>
+              <span class="hint">— huruf kecil, tanpa spasi panjang</span>
+            </label>
+            <div class="input-icon-wrap">
+              <i class="ico bi bi-hash"></i>
+              <input type="text" class="form-input has-icon" id="tagName" name="name"
+                placeholder="cth: laravel" autocomplete="off" maxlength="100"
+                oninput="onTagNameInput(this.value)">
+            </div>
+            <div class="char-counter" id="nameCounter">0 / 100</div>
+            <div class="field-error" id="errTagName">
+              <i class="bi bi-exclamation-circle-fill"></i> Nama tag wajib diisi
+            </div>
+          </div>
+
+          <!-- slug -->
+          <div class="form-group-custom">
+            <label class="form-label-custom">
+              Slug <span class="req">*</span>
+              <span class="hint">— otomatis dari nama, bisa diubah manual</span>
+            </label>
+            <div class="input-icon-wrap">
+              <i class="ico bi bi-link-45deg"></i>
+              <input type="text" class="form-input has-icon" id="tagSlug" name="slug"
+                placeholder="laravel" autocomplete="off"
+                oninput="onSlugInput(this.value)">
+            </div>
+            <div class="slug-preview">
+              <span class="slug-preview-label"><i class="bi bi-link-45deg me-1"></i>URL:</span>
+              <span class="slug-preview-val" id="slugPreview">/tags/—</span>
+            </div>
+            <div class="field-error" id="errTagSlug">
+              <i class="bi bi-exclamation-circle-fill"></i> Slug wajib diisi
+            </div>
+          </div>
+
+          <!-- warna tag -->
+          <div class="form-group-custom">
+            <label class="form-label-custom">
+              Warna Tag
+              <span class="hint">(untuk tampilan di UI)</span>
+            </label>
+            <div class="color-palette" id="colorPalette">
+              <!-- rendered by JS -->
+            </div>
+            <input type="hidden" name="color" id="tagColor" value="#ef4444">
+          </div>
+
+          <!-- live preview -->
+          <div class="section-divider"><span>Pratinjau</span></div>
+          <div class="tag-preview-box">
+            <div class="tag-preview-label">Tampilan tag</div>
+            <span class="tag-pill" id="tagPreviewPill"
+              style="background:#fee2e2;color:#b91c1c;border-color:#fecaca;font-size:15px;padding:6px 16px;">
+              #&nbsp;<span id="tagPreviewName">nama-tag</span>
+            </span>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ── PANEL BULK ── -->
+      <div class="mode-panel" id="panel-bulk">
+        <div class="form-group-custom" style="margin-bottom:10px;">
+          <label class="form-label-custom">
+            Tambah Banyak Tag Sekaligus
+            <span class="hint">— pisahkan dengan koma atau baris baru</span>
+          </label>
+          <textarea class="bulk-input" id="bulkInput" placeholder="laravel, php, javascript&#10;vue-js&#10;react, node-js"
+            oninput="renderBulkPreview()"></textarea>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span style="font-size:11.5px;color:var(--text-muted);">Tag akan di-slugify otomatis</span>
+            <span style="font-size:11.5px;color:var(--teal);font-weight:600;" id="bulkCount">0 tag</span>
+          </div>
+        </div>
+        <div class="section-divider"><span>Pratinjau tag yang akan dibuat</span></div>
+        <div class="bulk-tags-preview" id="bulkPreview">
+          <span style="font-size:12.5px;color:var(--text-muted);">Ketik di atas untuk melihat pratinjau...</span>
+        </div>
+      </div>
+
+    </div><!-- /.modal-body -->
+
+    <div class="modal-footer-custom">
+      <button class="btn-cancel-modal" onclick="hideAddModal()">
+        <i class="bi bi-x-lg me-1"></i> Batal
+      </button>
+      <button class="btn-save-modal" id="btnSaveTag" onclick="submitTag()">
+        <span class="btn-save-text"><i class="bi bi-hash me-1"></i> Simpan Tag</span>
+        <span class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════ LOGOUT MODAL ══════ -->
+<div class="modal-overlay" id="logoutModal" onclick="if(event.target===this)hideLogoutModal()">
+  <div class="modal-box-sm">
+    <div class="modal-icon-wrap">
+      <div class="modal-icon-ring"></div>
+      <i class="bi bi-box-arrow-right" style="color:#ef4444;"></i>
+    </div>
+    <h3 class="modal-title">Yakin ingin keluar?</h3>
+    <p class="modal-desc">Anda akan keluar dari sesi aktif LearnHub.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="hideLogoutModal()"><i class="bi bi-x-lg me-1"></i> Batal</button>
+      <button class="btn-modal-confirm" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-1"></i> Ya, Keluar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  /* ─── Sidebar ─── */
+  const sidebar=document.getElementById('sidebar'),mainArea=document.getElementById('mainArea'),backdrop=document.getElementById('sidebarBackdrop'),hamburgerIcon=document.getElementById('hamburgerIcon');
+  let sidebarCollapsed=false;
+  const isMobile=()=>window.innerWidth<992;
+  function toggleSidebar(){if(isMobile()){const o=sidebar.classList.contains('mobile-open');if(o)closeMobileSidebar();else{sidebar.classList.add('mobile-open');backdrop.classList.add('show');document.body.classList.add('no-scroll');}}else{sidebarCollapsed=!sidebarCollapsed;sidebar.classList.toggle('collapsed',sidebarCollapsed);mainArea.classList.toggle('sidebar-collapsed',sidebarCollapsed);hamburgerIcon.className=sidebarCollapsed?'bi bi-layout-sidebar':'bi bi-list';}}
+  function closeMobileSidebar(){sidebar.classList.remove('mobile-open');backdrop.classList.remove('show');document.body.classList.remove('no-scroll');}
+  window.addEventListener('resize',()=>{if(!isMobile())closeMobileSidebar();});
+  document.querySelectorAll('.nav-link-custom').forEach(l=>{l.addEventListener('click',function(e){if(!this.getAttribute('href')||this.getAttribute('href')==='#')e.preventDefault();document.querySelectorAll('.nav-link-custom').forEach(x=>x.classList.remove('active'));this.classList.add('active');if(isMobile())closeMobileSidebar();});});
+
+  /* ─── Dropdown ─── */
+  const userTrigger=document.getElementById('userTrigger'),userDropdown=document.getElementById('userDropdown');
+  function toggleUserDropdown(){const o=userDropdown.classList.toggle('open');userTrigger.classList.toggle('open',o);}
+  document.addEventListener('click',e=>{if(!userTrigger.contains(e.target)&&!userDropdown.contains(e.target)){userDropdown.classList.remove('open');userTrigger.classList.remove('open');}});
+
+  /* ─── Logout ─── */
+  function showLogoutModal(){userDropdown.classList.remove('open');userTrigger.classList.remove('open');document.getElementById('logoutModal').classList.add('show');}
+  function hideLogoutModal(){document.getElementById('logoutModal').classList.remove('show');}
+  function confirmLogout(){const b=document.querySelector('#logoutModal .btn-modal-confirm');b.innerHTML='<span class="spinner-border spinner-border-sm me-1" style="width:14px;height:14px;border-width:2px;"></span>Keluar...';b.disabled=true;setTimeout(()=>window.location.href='/logout',1400);}
+
+  /* ─── FAB ─── */
+  const fab=document.getElementById('fabBtn');
+  window.addEventListener('scroll',()=>fab.classList.toggle('visible',window.scrollY>180),{passive:true});
+
+  /* ─── Filter table ─── */
+  function filterTable(){
+    const q=document.getElementById('searchTag').value.toLowerCase();
+    const u=document.getElementById('filterUsage').value;
+    const rows=document.querySelectorAll('#tagTbody tr:not(#emptyRow)');
+    let v=0;
+    rows.forEach(row=>{
+      const txt=row.textContent.toLowerCase();
+      const usage=row.dataset.usage||'';
+      const show=(!q||txt.includes(q))&&(!u||usage===u);
+      row.style.display=show?'':'none';
+      if(show)v++;
+    });
+    document.getElementById('emptyRow').style.display=v===0?'':'none';
+  }
+
+  /* ─── Modal ─── */
+  function showAddModal(){
+    document.getElementById('addModal').classList.add('show');
+    document.body.classList.add('no-scroll');
+    renderColorPalette();
+  }
+  function hideAddModal(){
+    document.getElementById('addModal').classList.remove('show');
+    document.body.classList.remove('no-scroll');
+  }
+  function handleBackdrop(e){if(e.target===document.getElementById('addModal'))hideAddModal();}
+
+  /* ─── Mode tabs ─── */
+  let currentMode='single';
+  function switchMode(btn,mode){
+    document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+mode).classList.add('active');
+    currentMode=mode;
+    const saveBtn=document.getElementById('btnSaveTag');
+    saveBtn.querySelector('.btn-save-text').innerHTML=mode==='bulk'
+      ?'<i class="bi bi-tags me-1"></i> Simpan Semua Tag'
+      :'<i class="bi bi-hash me-1"></i> Simpan Tag';
+  }
+
+  /* ─── Color palette ─── */
+  const COLORS=[
+    {bg:'#fee2e2',text:'#b91c1c',border:'#fecaca',val:'#ef4444'},
+    {bg:'#fef9c3',text:'#854d0e',border:'#fde68a',val:'#f59e0b'},
+    {bg:'#dbeafe',text:'#1e40af',border:'#bfdbfe',val:'#3b82f6'},
+    {bg:'#ecfdf5',text:'#065f46',border:'#a7f3d0',val:'#10b981'},
+    {bg:'#ede9fe',text:'#6d28d9',border:'#c4b5fd',val:'#8b5cf6'},
+    {bg:'#ecfeff',text:'#0e7490',border:'#a5f3fc',val:'#06b6d4'},
+    {bg:'#fdf4ff',text:'#7e22ce',border:'#e9d5ff',val:'#a855f7'},
+    {bg:'#fff7ed',text:'#c2410c',border:'#fed7aa',val:'#f97316'},
+    {bg:'#f0fdf4',text:'#15803d',border:'#bbf7d0',val:'#22c55e'},
+    {bg:'#fef2f2',text:'#991b1b',border:'#fecaca',val:'#dc2626'},
+    {bg:'#f1f5f9',text:'#475569',border:'#e2e8f0',val:'#64748b'},
+    {bg:'#0f172a',text:'#e2e8f0',border:'#334155',val:'#0f172a'},
+  ];
+  let selectedColor=COLORS[0];
+
+  function renderColorPalette(){
+    const pal=document.getElementById('colorPalette');
+    pal.innerHTML='';
+    COLORS.forEach((c,i)=>{
+      const el=document.createElement('div');
+      el.className='color-swatch'+(i===0?' active':'');
+      el.style.background=c.bg;
+      el.style.border='2.5px solid '+(i===0?'var(--text-main)':'transparent');
+      el.title=c.val;
+      el.onclick=()=>pickColor(el,c,i);
+      pal.appendChild(el);
+    });
+  }
+
+  function pickColor(el,c,idx){
+    document.querySelectorAll('.color-swatch').forEach((s,i)=>{
+      s.classList.toggle('active',i===idx);
+      s.style.border='2.5px solid '+(i===idx?'var(--text-main)':'transparent');
+    });
+    selectedColor=c;
+    document.getElementById('tagColor').value=c.val;
+    updatePreview();
+  }
+
+  /* ─── Slug helpers ─── */
+  function toSlug(s){return s.toLowerCase().replace(/[\s_]+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');}
+
+  function onTagNameInput(val){
+    const slug=toSlug(val);
+    document.getElementById('tagSlug').value=slug;
+    document.getElementById('slugPreview').textContent='/tags/'+(slug||'—');
+    const c=document.getElementById('nameCounter');
+    c.textContent=val.length+' / 100';
+    c.className='char-counter'+(val.length>80?' warn':'')+(val.length>=100?' over':'');
+    document.getElementById('errTagName').classList.remove('show');
+    document.getElementById('tagName').classList.remove('is-invalid');
+    updatePreview();
+  }
+
+  function onSlugInput(val){
+    const slug=toSlug(val);
+    document.getElementById('tagSlug').value=slug;
+    document.getElementById('slugPreview').textContent='/tags/'+(slug||'—');
+    document.getElementById('errTagSlug').classList.remove('show');
+    document.getElementById('tagSlug').classList.remove('is-invalid');
+  }
+
+  function updatePreview(){
+    const name=document.getElementById('tagName').value.trim()||'nama-tag';
+    const pill=document.getElementById('tagPreviewPill');
+    const c=selectedColor;
+    pill.style.background=c.bg;
+    pill.style.color=c.text;
+    pill.style.borderColor=c.border;
+    document.getElementById('tagPreviewName').textContent=toSlug(name)||'nama-tag';
+  }
+
+  /* ─── Bulk preview ─── */
+  function renderBulkPreview(){
+    const raw=document.getElementById('bulkInput').value;
+    const tags=[...new Set(
+      raw.split(/[,\n]+/)
+        .map(t=>toSlug(t.trim()))
+        .filter(t=>t.length>0)
+    )];
+    document.getElementById('bulkCount').textContent=tags.length+' tag';
+    const prev=document.getElementById('bulkPreview');
+    if(tags.length===0){prev.innerHTML='<span style="font-size:12.5px;color:var(--text-muted);">Ketik di atas untuk melihat pratinjau...</span>';return;}
+    prev.innerHTML=tags.map((t,i)=>{
+      const c=COLORS[i%COLORS.length];
+      return `<span class="tag-pill" style="background:${c.bg};color:${c.text};border-color:${c.border};font-size:12px;"># ${t}</span>`;
+    }).join('');
+  }
+
+  /* ─── Submit ─── */
+  async function submitTag(){
+    const btn=document.getElementById('btnSaveTag');
+
+    if(currentMode==='single'){
+      const name=document.getElementById('tagName');
+      const slug=document.getElementById('tagSlug');
+      name.classList.remove('is-invalid');
+      slug.classList.remove('is-invalid');
+      document.getElementById('errTagName').classList.remove('show');
+      document.getElementById('errTagSlug').classList.remove('show');
+      let valid=true;
+      if(!name.value.trim()){name.classList.add('is-invalid');document.getElementById('errTagName').classList.add('show');valid=false;}
+      if(!slug.value.trim()){slug.classList.add('is-invalid');document.getElementById('errTagSlug').classList.add('show');valid=false;}
+      if(!valid)return;
+
+      btn.classList.add('loading');btn.disabled=true;
+      await new Promise(r=>setTimeout(r,1400));
+      btn.classList.remove('loading');btn.disabled=false;
+      const saved=name.value.trim();
+      hideAddModal();
+      showToast(`Tag "#${toSlug(saved)}" berhasil ditambahkan!`,'success');
+      document.getElementById('addTagForm').reset();
+      document.getElementById('slugPreview').textContent='/tags/—';
+      document.getElementById('nameCounter').textContent='0 / 100';
+      updatePreview();
+
+    } else {
+      const raw=document.getElementById('bulkInput').value;
+      const tags=[...new Set(raw.split(/[,\n]+/).map(t=>toSlug(t.trim())).filter(t=>t.length>0))];
+      if(tags.length===0){showToast('Tidak ada tag yang valid untuk disimpan.','error');return;}
+      btn.classList.add('loading');btn.disabled=true;
+      await new Promise(r=>setTimeout(r,1600));
+      btn.classList.remove('loading');btn.disabled=false;
+      hideAddModal();
+      showToast(`${tags.length} tag berhasil ditambahkan!`,'success');
+      document.getElementById('bulkInput').value='';
+      document.getElementById('bulkPreview').innerHTML='<span style="font-size:12.5px;color:var(--text-muted);">Ketik di atas untuk melihat pratinjau...</span>';
+      document.getElementById('bulkCount').textContent='0 tag';
+    }
+  }
+
+  /* ─── Toast ─── */
+  function showToast(msg,type='success'){
+    const C={success:{bg:'#ecfdf5',color:'#10b981',border:'rgba(16,185,129,.3)',icon:'check-circle-fill'},info:{bg:'#eff6ff',color:'#2563eb',border:'rgba(37,99,235,.3)',icon:'info-circle-fill'},error:{bg:'#fef2f2',color:'#ef4444',border:'rgba(239,68,68,.3)',icon:'exclamation-circle-fill'}};
+    const c=C[type]||C.success;
+    const t=document.createElement('div');
+    t.style.cssText=`position:fixed;top:76px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.12);background:${c.bg};color:${c.color};border:1px solid ${c.border};transform:translateX(120%);transition:transform .35s cubic-bezier(.34,1.4,.64,1);max-width:320px;`;
+    t.innerHTML=`<i class="bi bi-${c.icon}" style="font-size:17px;flex-shrink:0;"></i><span>${msg}</span>`;
+    document.body.appendChild(t);
+    requestAnimationFrame(()=>t.style.transform='translateX(0)');
+    setTimeout(()=>{t.style.transform='translateX(120%)';setTimeout(()=>t.remove(),380);},3400);
+  }
+
+  /* ─── ESC ─── */
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideAddModal();hideLogoutModal();}});
+</script>
+</body>
+</html>
