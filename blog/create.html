@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tulis Artikel — LearnHub LMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- CKEditor 5 CDN -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.umd.js"></script>
+  <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css">
+  <style>
+    :root{
+      --sidebar-w:260px;--sidebar-w-col:72px;--topbar-h:64px;
+      --primary:#2563eb;--primary-light:#3b82f6;--primary-xlight:#eff6ff;
+      --accent:#06b6d4;
+      --success:#10b981;--success-light:#ecfdf5;
+      --warning:#f59e0b;--warning-light:#fffbeb;
+      --danger:#ef4444;--danger-light:#fef2f2;
+      --purple:#8b5cf6;--purple-light:#f5f3ff;
+      --indigo:#6366f1;--indigo-light:#eef2ff;
+      --sidebar-bg:#0f172a;--sidebar-text:rgba(226,232,240,.75);--sidebar-text-act:#fff;
+      --sidebar-hover:rgba(255,255,255,.06);--sidebar-active:rgba(37,99,235,.25);--sidebar-border:rgba(255,255,255,.07);
+      --topbar-bg:#fff;--body-bg:#f1f5f9;
+      --card-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+      --border:#e2e8f0;--text-main:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
+      --radius:14px;--transition:all .25s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:var(--body-bg);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+    body.no-scroll{overflow:hidden;}
+    ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;z-index:200;transition:width .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+    .sidebar.collapsed{width:var(--sidebar-w-col);}
+    .sidebar-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .sidebar-backdrop.show{opacity:1;pointer-events:all;}
+    .sidebar-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 18px;border-bottom:1px solid var(--sidebar-border);flex-shrink:0;overflow:hidden;min-height:72px;}
+    .brand-icon{width:38px;height:38px;border-radius:11px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,99,235,.4);}
+    .brand-icon i{color:#fff;font-size:18px;animation:iconFloat 3s ease-in-out infinite;}
+    @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0deg);}30%{transform:translateY(-2px) rotate(-5deg);}60%{transform:translateY(1px) rotate(3deg);}}
+    .brand-text{overflow:hidden;white-space:nowrap;transition:opacity .2s,width .28s;}
+    .brand-name{font-size:16px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(135deg,#fff,#7dd3fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .brand-ver{font-size:10.5px;color:rgba(148,163,184,.7);margin-top:1px;}
+    .sidebar.collapsed .brand-text{opacity:0;pointer-events:none;width:0;}
+    .sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+    .sidebar-nav::-webkit-scrollbar{width:3px;}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+    .nav-cat{font-size:9.5px;font-weight:600;color:rgba(148,163,184,.5);letter-spacing:1.2px;text-transform:uppercase;padding:14px 20px 5px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+    .sidebar.collapsed .nav-cat{opacity:0;}
+    .nav-item{padding:2px 10px;}
+    .nav-lnk{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--sidebar-text);text-decoration:none;font-size:13.5px;font-weight:500;transition:var(--transition);position:relative;overflow:hidden;white-space:nowrap;}
+    .nav-lnk .ni{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.06);transition:var(--transition);}
+    .nav-lnk:hover{background:var(--sidebar-hover);color:var(--sidebar-text-act);}
+    .nav-lnk:hover .ni{background:rgba(59,130,246,.2);color:var(--primary-light);}
+    .nav-lnk.active{background:var(--sidebar-active);color:var(--sidebar-text-act);}
+    .nav-lnk.active .ni{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.45);}
+    .nav-lnk.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--primary-light);border-radius:0 3px 3px 0;}
+    .nav-label{transition:opacity .2s,width .28s;}
+    .sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden;}
+    .nbadge{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;transition:opacity .2s;}
+    .nbadge.red{background:rgba(239,68,68,.2);color:#fca5a5;}
+    .nbadge.blue{background:rgba(59,130,246,.2);color:#93c5fd;}
+    .nbadge.green{background:rgba(16,185,129,.2);color:#6ee7b7;}
+    .sidebar.collapsed .nbadge{opacity:0;width:0;overflow:hidden;}
+    .sidebar.collapsed .nav-lnk{justify-content:center;padding:10px;}
+    .sidebar.collapsed .nav-lnk .ni{background:transparent;}
+    .sidebar-foot{padding:12px 10px;border-top:1px solid var(--sidebar-border);flex-shrink:0;}
+    .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:var(--transition);overflow:hidden;}
+    .sidebar-user:hover{background:var(--sidebar-hover);}
+    .s-ava{width:34px;height:34px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+    .s-name{font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;}
+    .s-role{font-size:10.5px;color:rgba(148,163,184,.6);}
+    .sidebar.collapsed .s-info{display:none;}
+    @media(min-width:992px){
+      .sidebar.collapsed .nav-lnk::after{content:attr(data-label);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);background:var(--text-main);color:#fff;font-size:12px;font-weight:500;padding:5px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;}
+      .sidebar.collapsed .nav-lnk:hover::after{opacity:1;}
+    }
+
+    /* ── MAIN ── */
+    .main-area{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;transition:margin-left .28s cubic-bezier(.4,0,.2,1);}
+    .main-area.sb-col{margin-left:var(--sidebar-w-col);}
+
+    /* ── TOPBAR ── */
+    .topbar{position:sticky;top:0;z-index:100;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .hamburger{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:18px;transition:var(--transition);}
+    .hamburger:hover{background:var(--primary-xlight);color:var(--primary);}
+    .topbar-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);flex:1;min-width:0;}
+    .topbar-breadcrumb a{color:var(--text-secondary);text-decoration:none;white-space:nowrap;}
+    .topbar-breadcrumb a:hover{color:var(--primary);}
+    .topbar-breadcrumb .sep{color:var(--text-muted);}
+    .topbar-breadcrumb .cur{color:var(--purple);font-weight:600;white-space:nowrap;}
+    .tb-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .tb-btn{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--text-secondary);font-size:17px;transition:var(--transition);position:relative;}
+    .tb-btn:hover{background:var(--primary-xlight);color:var(--primary);}
+    .ndot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid #fff;animation:dotPulse 2s infinite;}
+    @keyframes dotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+    .user-btn{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:12px;border:1.5px solid var(--border);background:transparent;cursor:pointer;transition:var(--transition);}
+    .user-btn:hover{background:var(--primary-xlight);border-color:var(--primary-light);}
+    .u-ava{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+    .u-name{font-size:12.5px;font-weight:600;color:var(--text-main);white-space:nowrap;}
+
+    /* ── CONTENT ── */
+    .content-area{flex:1;padding:24px;padding-bottom:100px;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+    /* Page header */
+    .page-header{margin-bottom:24px;}
+    .page-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px;}
+    .page-title-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;background:linear-gradient(135deg,var(--purple),#a78bfa);box-shadow:0 4px 12px rgba(139,92,246,.3);}
+    .page-desc{font-size:13px;color:var(--text-muted);}
+
+    /* ── EDITOR LAYOUT ── */
+    .editor-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+
+    /* ── SECTION CARD ── */
+    .section-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:18px;animation:fadeUp .4s ease both;}
+    .section-card:nth-child(2){animation-delay:.06s;}
+    .section-card:nth-child(3){animation-delay:.12s;}
+    .section-card:nth-child(4){animation-delay:.18s;}
+    .sc-header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:#fafafa;}
+    .sc-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+    .sc-title{font-size:13.5px;font-weight:700;color:var(--text-main);}
+    .sc-sub{font-size:11.5px;color:var(--text-muted);margin-top:1px;}
+    .sc-body{padding:20px;}
+
+    /* Form elements */
+    .form-group{margin-bottom:18px;}
+    .form-group:last-child{margin-bottom:0;}
+    .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-label{font-size:12.5px;font-weight:600;color:var(--text-main);margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .form-label .req{color:var(--danger);}
+    .form-label .hint{font-size:11px;color:var(--text-muted);font-weight:400;}
+    .form-label .count{font-size:11px;color:var(--text-muted);font-weight:400;margin-left:auto;}
+    .f-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;}
+    .f-input::placeholder{color:var(--text-muted);}
+    .f-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+    .f-sel{width:100%;padding:10px 32px 10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;appearance:none;cursor:pointer;transition:var(--transition);}
+    .f-sel:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+    .f-textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Poppins',sans-serif;font-size:13.5px;color:var(--text-main);outline:none;transition:var(--transition);background:#fff;resize:vertical;min-height:80px;line-height:1.6;}
+    .f-textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+    .f-textarea::placeholder{color:var(--text-muted);}
+
+    /* Slug preview row */
+    .slug-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+    .slug-prefix{font-size:12px;color:var(--text-muted);white-space:nowrap;}
+    .slug-val{font-family:'Courier New',monospace;font-size:12.5px;font-weight:700;color:var(--purple);background:var(--purple-light);border:1px solid rgba(139,92,246,.2);padding:5px 12px;border-radius:7px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .slug-edit-btn{padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:var(--transition);}
+    .slug-edit-btn:hover{border-color:var(--purple);color:var(--purple);}
+
+    /* Cover upload */
+    .cover-upload-area{width:100%;border:2.5px dashed var(--border);border-radius:12px;background:var(--body-bg);transition:var(--transition);cursor:pointer;overflow:hidden;position:relative;}
+    .cover-upload-area:hover{border-color:var(--purple);background:var(--purple-light);}
+    .cover-upload-area.has-image{border-style:solid;border-color:var(--purple);background:transparent;}
+    .cover-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px 20px;}
+    .cover-placeholder i{font-size:36px;color:var(--text-muted);}
+    .cover-placeholder .c-title{font-size:13.5px;font-weight:600;color:var(--text-main);}
+    .cover-placeholder .c-sub{font-size:12px;color:var(--text-muted);}
+    .cover-placeholder .c-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:#fff;border:1px solid var(--border);color:var(--text-muted);}
+    #coverPreview{width:100%;max-height:220px;object-fit:cover;border-radius:10px;display:none;}
+    .cover-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;gap:10px;border-radius:10px;}
+    .cover-upload-area:hover .cover-overlay{display:flex;}
+    .cover-overlay-btn{padding:7px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.6);background:rgba(255,255,255,.15);backdrop-filter:blur(4px);color:#fff;font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:var(--transition);}
+    .cover-overlay-btn:hover{background:rgba(255,255,255,.3);}
+    .cover-overlay-btn.danger{border-color:rgba(239,68,68,.6);color:#fca5a5;}
+    .cover-overlay-btn.danger:hover{background:rgba(239,68,68,.3);}
+    #coverInput{display:none;}
+
+    /* ── CKEditor wrapper ── */
+    .ck-editor-wrap{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+    .ck-editor-wrap:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+    /* Override CKEditor border/radius so our wrapper handles it */
+    .ck-editor-wrap .ck.ck-editor{border:none!important;border-radius:0!important;}
+    .ck-editor-wrap .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content{border-radius:0!important;border-left:none!important;border-right:none!important;border-top:none!important;}
+    .ck-editor-wrap .ck.ck-editor__main .ck-editor__editable{border-radius:0 0 10px 10px!important;border:none!important;border-top:1px solid var(--border)!important;min-height:380px;font-family:'Poppins',sans-serif;font-size:14px;line-height:1.75;color:var(--text-main);padding:20px 24px;}
+    .ck-editor-wrap .ck.ck-editor__main .ck-editor__editable:focus{box-shadow:none!important;}
+    .ck-editor-wrap .ck.ck-toolbar{background:#f8fafc!important;border:none!important;border-bottom:1px solid var(--border)!important;padding:6px 10px!important;}
+    .ck.ck-button:hover:not(.ck-disabled){background:var(--purple-light)!important;}
+    .ck.ck-button.ck-on{background:var(--purple-light)!important;color:var(--purple)!important;}
+    .word-count-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#fafafa;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);}
+    .word-count-bar strong{color:var(--text-main);}
+    .readtime{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);}
+
+    /* Tags input */
+    .tags-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;background:#fff;min-height:44px;align-items:center;cursor:text;transition:var(--transition);}
+    .tags-wrap:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12);}
+    .tag-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:var(--purple-light);color:var(--purple);font-size:12px;font-weight:600;animation:fadeUp .15s ease;}
+    .tag-pill i{font-size:11px;cursor:pointer;opacity:.6;transition:opacity .15s;}
+    .tag-pill i:hover{opacity:1;color:var(--danger);}
+    .tags-wrap input{border:none;outline:none;font-family:'Poppins',sans-serif;font-size:13px;color:var(--text-main);background:transparent;min-width:120px;flex:1;padding:2px 0;}
+    .tag-hint{font-size:11.5px;color:var(--text-muted);margin-top:5px;}
+
+    /* Featured image alternative text */
+    .alt-input{display:none;margin-top:8px;}
+    .alt-input.visible{display:block;}
+
+    /* ── SEO Preview ── */
+    .seo-preview-box{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:12px;}
+    .seo-prev-url{font-size:12px;color:#0f9d58;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .seo-prev-title{font-size:15px;font-weight:500;color:#1a0dab;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .seo-prev-desc{font-size:13px;color:#4d4d4d;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+    /* ── SIDEBAR PANEL ── */
+    .side-panel{position:sticky;top:calc(var(--topbar-h) + 20px);}
+    .side-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--card-shadow);margin-bottom:16px;overflow:hidden;animation:fadeUp .45s ease both;}
+    .side-card:nth-child(2){animation-delay:.08s;}
+    .side-card:nth-child(3){animation-delay:.16s;}
+    .side-card:nth-child(4){animation-delay:.24s;}
+    .sc2-header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .sc2-header i{font-size:15px;color:var(--purple);}
+    .sc2-title{font-size:13.5px;font-weight:700;color:var(--text-main);}
+    .sc2-body{padding:16px;}
+
+    /* Status radio */
+    .status-opt{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);background:#fff;margin-bottom:8px;}
+    .status-opt:last-child{margin-bottom:0;}
+    .status-opt:hover{border-color:rgba(139,92,246,.4);background:var(--purple-light);}
+    .status-opt.selected{border-color:var(--purple);background:var(--purple-light);}
+    .status-opt input[type=radio]{display:none;}
+    .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .status-dot.published{background:var(--success);}
+    .status-dot.draft{background:var(--text-muted);}
+    .status-dot.scheduled{background:var(--indigo);}
+    .status-lbl{font-size:13px;font-weight:600;color:var(--text-main);}
+    .status-desc{font-size:11px;color:var(--text-muted);}
+
+    /* Schedule datetime */
+    .schedule-wrap{margin-top:10px;padding:10px 12px;background:var(--indigo-light);border:1px solid rgba(99,102,241,.2);border-radius:9px;display:none;}
+    .schedule-wrap.show{display:block;}
+    .schedule-wrap label{font-size:12px;font-weight:600;color:var(--indigo);margin-bottom:5px;display:block;}
+    .schedule-wrap input{width:100%;padding:7px 10px;border:1.5px solid rgba(99,102,241,.3);border-radius:7px;font-family:'Poppins',sans-serif;font-size:12.5px;color:var(--text-main);outline:none;background:#fff;}
+    .schedule-wrap input:focus{border-color:var(--indigo);}
+
+    /* Toggle switch */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f1f5f9;}
+    .toggle-row:last-child{border-bottom:none;padding-bottom:0;}
+    .toggle-info{flex:1;min-width:0;}
+    .toggle-info h6{font-size:12.5px;font-weight:600;color:var(--text-main);margin:0 0 1px;}
+    .toggle-info p{font-size:11px;color:var(--text-muted);margin:0;}
+    .toggle-sw{display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;margin-left:10px;}
+    .toggle-sw input{display:none;}
+    .toggle-track{width:38px;height:21px;border-radius:11px;background:#e2e8f0;transition:background .2s;position:relative;}
+    .toggle-sw input:checked + .toggle-track{background:var(--purple);}
+    .toggle-thumb{position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s;}
+    .toggle-sw input:checked + .toggle-track .toggle-thumb{transform:translateX(17px);}
+
+    /* Summary rows */
+    .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;}
+    .sum-row:last-child{border-bottom:none;padding-bottom:0;}
+    .sum-lbl{color:var(--text-muted);}
+    .sum-val{font-weight:600;color:var(--text-main);}
+    .sum-val.purple{color:var(--purple);}
+    .sum-val.success{color:var(--success);}
+
+    /* ── STICKY ACTION BAR ── */
+    .action-bar{position:fixed;bottom:0;left:var(--sidebar-w);right:0;z-index:150;background:#fff;border-top:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.06);transition:left .28s cubic-bezier(.4,0,.2,1);}
+    .action-bar.sb-col{left:var(--sidebar-w-col);}
+    .autosave-status{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-muted);}
+    .autosave-dot{width:7px;height:7px;border-radius:50%;background:var(--success);transition:background .3s;}
+    .autosave-dot.saving{background:var(--warning);animation:dotPulse 1s infinite;}
+    .ab-right{display:flex;align-items:center;gap:8px;}
+    .btn-cancel{padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
+    .btn-cancel:hover{background:var(--danger-light);border-color:var(--danger);color:var(--danger);}
+    .btn-preview-ab{padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;}
+    .btn-preview-ab:hover{border-color:var(--primary-light);color:var(--primary);background:var(--primary-xlight);}
+    .btn-draft{padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;}
+    .btn-draft:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-light);}
+    .btn-publish{padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple),#a78bfa);color:#fff;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:var(--transition);box-shadow:0 3px 10px rgba(139,92,246,.35);display:inline-flex;align-items:center;gap:7px;}
+    .btn-publish:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 16px rgba(139,92,246,.45);}
+    .btn-publish .spin{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+    .modal-overlay.show{opacity:1;pointer-events:all;}
+    .modal-box{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);transform:scale(.92) translateY(16px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+    .modal-overlay.show .modal-box{transform:scale(1) translateY(0);}
+    .m-icon{width:72px;height:72px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;animation:mFloat 2.5s ease-in-out infinite;}
+    @keyframes mFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-4px) rotate(-5deg);}}
+    .m-icon-ring{position:absolute;inset:-6px;border-radius:50%;border:2px dashed;animation:ringR 6s linear infinite;}
+    @keyframes ringR{to{transform:rotate(360deg);}}
+    .m-title{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text-main);}
+    .m-desc{font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px;}
+    .m-actions{display:flex;gap:10px;}
+    .btn-mcancel{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--border);background:transparent;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition);}
+    .btn-mcancel:hover{background:var(--body-bg);}
+    .btn-mgo{flex:1;padding:11px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--purple),#a78bfa);font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:#fff;cursor:pointer;transition:var(--transition);box-shadow:0 4px 14px rgba(139,92,246,.35);}
+    .btn-mgo:hover{transform:translateY(-1px);}
+
+    /* Responsive */
+    @media(max-width:991px){.sidebar{transform:translateX(-100%);width:var(--sidebar-w)!important;}.sidebar.mobile-open{transform:translateX(0);}.main-area,.action-bar{margin-left:0!important;left:0!important;}.editor-layout{grid-template-columns:1fr;}.side-panel{position:static;}}
+    @media(max-width:767px){.content-area{padding:16px;}.topbar{padding:0 16px;}.action-bar{padding:12px 16px;flex-wrap:wrap;}.ab-right{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;}.btn-publish{grid-column:1/-1;}.form-row-2{grid-template-columns:1fr;}.u-name{display:none;}}
+  </style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+    <div class="brand-text"><div class="brand-name">LearnHub</div><div class="brand-ver">LMS Platform v2.0</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-cat">Overview</div>
+    <div class="nav-item"><a href="../dashboard.html" class="nav-lnk" data-label="Dashboard"><span class="ni"><i class="bi bi-grid-1x2-fill"></i></span><span class="nav-label">Dashboard</span></a></div>
+    <div class="nav-cat">Master Data</div>
+    <div class="nav-item"><a href="../categories.html" class="nav-lnk" data-label="Kategori"><span class="ni"><i class="bi bi-tags-fill"></i></span><span class="nav-label">Kategori</span></a></div>
+    <div class="nav-item"><a href="../users.html" class="nav-lnk" data-label="Pengguna"><span class="ni"><i class="bi bi-people-fill"></i></span><span class="nav-label">Pengguna</span><span class="nbadge green">284</span></a></div>
+    <div class="nav-cat">Akademik</div>
+    <div class="nav-item"><a href="../courses.html" class="nav-lnk" data-label="Kursus"><span class="ni"><i class="bi bi-play-btn-fill"></i></span><span class="nav-label">Kursus</span><span class="nbadge blue">380</span></a></div>
+    <div class="nav-item"><a href="../quizzes.html" class="nav-lnk" data-label="Kuis"><span class="ni"><i class="bi bi-patch-question-fill"></i></span><span class="nav-label">Kuis</span></a></div>
+    <div class="nav-item"><a href="../certificates.html" class="nav-lnk" data-label="Sertifikat"><span class="ni"><i class="bi bi-award-fill"></i></span><span class="nav-label">Sertifikat</span></a></div>
+    <div class="nav-cat">Transaksi</div>
+    <div class="nav-item"><a href="../orders.html" class="nav-lnk" data-label="Pesanan"><span class="ni"><i class="bi bi-bag-fill"></i></span><span class="nav-label">Pesanan</span><span class="nbadge red">5</span></a></div>
+    <div class="nav-item"><a href="../coupons.html" class="nav-lnk" data-label="Kupon"><span class="ni"><i class="bi bi-ticket-perforated-fill"></i></span><span class="nav-label">Kupon</span></a></div>
+    <div class="nav-item"><a href="../payments.html" class="nav-lnk" data-label="Pembayaran"><span class="ni"><i class="bi bi-credit-card-2-front-fill"></i></span><span class="nav-label">Pembayaran</span></a></div>
+    <div class="nav-cat">Konten</div>
+    <div class="nav-item"><a href="../blog.html" class="nav-lnk active" data-label="Blog"><span class="ni"><i class="bi bi-journal-richtext"></i></span><span class="nav-label">Blog</span></a></div>
+    <div class="nav-item"><a href="#" class="nav-lnk" data-label="Komentar"><span class="ni"><i class="bi bi-chat-dots-fill"></i></span><span class="nav-label">Komentar</span><span class="nbadge red">12</span></a></div>
+    <div class="nav-item"><a href="#" class="nav-lnk" data-label="Media"><span class="ni"><i class="bi bi-images"></i></span><span class="nav-label">Media</span></a></div>
+    <div class="nav-cat">Sistem</div>
+    <div class="nav-item"><a href="#" class="nav-lnk" data-label="Pengaturan"><span class="ni"><i class="bi bi-gear-fill"></i></span><span class="nav-label">Pengaturan</span></a></div>
+  </nav>
+  <div class="sidebar-foot">
+    <div class="sidebar-user">
+      <div class="s-ava">A</div>
+      <div class="s-info"><div class="s-name">Ahmad Santoso</div><div class="s-role">Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-area" id="mainArea">
+
+  <header class="topbar">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><i class="bi bi-list" id="hamburgerIcon"></i></button>
+    <div class="topbar-breadcrumb">
+      <i class="bi bi-house-door-fill" style="color:var(--primary);flex-shrink:0;font-size:15px;"></i>
+      <span class="sep">/</span><a href="../dashboard.html">Dashboard</a>
+      <span class="sep">/</span><a href="../blog.html">Blog</a>
+      <span class="sep">/</span><span class="cur">Tulis Artikel Baru</span>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn"><i class="bi bi-bell-fill"></i><span class="ndot"></span></button>
+      <div class="user-btn">
+        <div class="u-ava">A</div>
+        <span class="u-name">Ahmad Santoso</span>
+        <i class="bi bi-chevron-down" style="font-size:12px;color:var(--text-muted);"></i>
+      </div>
+    </div>
+  </header>
+
+  <main class="content-area" id="contentArea">
+
+    <div class="page-header">
+      <div class="page-title"><div class="page-title-icon"><i class="bi bi-pencil-square"></i></div>Tulis Artikel Baru</div>
+      <div class="page-desc">Buat artikel, tutorial, atau berita baru untuk blog LearnHub dengan editor lengkap.</div>
+    </div>
+
+    <div class="editor-layout">
+
+      <!-- ══ MAIN COLUMN ══ -->
+      <div>
+
+        <!-- Section 1: Judul & Slug -->
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:var(--purple-light);color:var(--purple);"><i class="bi bi-type-h1"></i></div>
+            <div><div class="sc-title">Judul &amp; Slug</div><div class="sc-sub">Identitas utama artikel</div></div>
+          </div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-label">Judul Artikel <span class="req">*</span></label>
+              <input type="text" class="f-input" id="postTitle" placeholder="Masukkan judul artikel yang menarik..." style="font-size:16px;font-weight:600;padding:12px 16px;" oninput="onTitleInput(this.value)">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Slug URL</label>
+              <div class="slug-row">
+                <span class="slug-prefix">learnhub.id/blog/</span>
+                <span class="slug-val" id="slugVal">judul-artikel-anda</span>
+                <button class="slug-edit-btn" onclick="editSlug()"><i class="bi bi-pencil-fill"></i> Edit</button>
+              </div>
+              <input type="text" class="f-input" id="slugInput" style="display:none;margin-top:6px;font-family:monospace;" placeholder="edit-slug-manual" oninput="document.getElementById('slugVal').textContent=this.value||'judul-artikel-anda'">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Gambar Sampul -->
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:var(--primary-xlight);color:var(--primary);"><i class="bi bi-image-fill"></i></div>
+            <div><div class="sc-title">Gambar Sampul</div><div class="sc-sub">Ditampilkan di daftar artikel &amp; media sosial · Rekomendasi 1200×630px</div></div>
+          </div>
+          <div class="sc-body">
+            <input type="file" id="coverInput" accept="image/*" onchange="handleCoverUpload(this)">
+            <div class="cover-upload-area" id="coverArea" onclick="document.getElementById('coverInput').click()">
+              <div class="cover-placeholder" id="coverPlaceholder">
+                <i class="bi bi-cloud-upload-fill"></i>
+                <div class="c-title">Klik untuk upload gambar sampul</div>
+                <div class="c-sub">atau drag &amp; drop file gambar ke sini</div>
+                <span class="c-badge">JPG · PNG · WEBP · Maks. 2MB</span>
+              </div>
+              <img id="coverPreview" src="" alt="Cover preview">
+              <div class="cover-overlay" id="coverOverlay">
+                <button class="cover-overlay-btn" onclick="event.stopPropagation();document.getElementById('coverInput').click()"><i class="bi bi-arrow-repeat"></i> Ganti</button>
+                <button class="cover-overlay-btn danger" onclick="event.stopPropagation();removeCover()"><i class="bi bi-trash-fill"></i> Hapus</button>
+              </div>
+            </div>
+            <div class="alt-input" id="altInputWrap">
+              <label class="form-label" style="margin-top:10px;">Alt Text <span class="hint">(untuk aksesibilitas &amp; SEO)</span></label>
+              <input type="text" class="f-input" placeholder="Deskripsi singkat gambar sampul...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Konten Artikel (CKEditor) -->
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:var(--success-light);color:var(--success);"><i class="bi bi-body-text"></i></div>
+            <div><div class="sc-title">Isi Artikel</div><div class="sc-sub">Tulis konten artikel menggunakan editor lengkap di bawah</div></div>
+          </div>
+          <div class="sc-body">
+            <div class="ck-editor-wrap">
+              <div id="ckEditorInstance"></div>
+            </div>
+            <div class="word-count-bar">
+              <div><strong id="wordCount">0</strong> kata &nbsp;·&nbsp; <strong id="charCount">0</strong> karakter</div>
+              <div class="readtime"><i class="bi bi-clock"></i><span id="readTime">0 menit baca</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Ringkasan -->
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:var(--warning-light);color:var(--warning);"><i class="bi bi-card-text"></i></div>
+            <div><div class="sc-title">Ringkasan Artikel</div><div class="sc-sub">Ditampilkan di daftar blog &amp; preview media sosial</div></div>
+          </div>
+          <div class="sc-body">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">
+                Excerpt / Ringkasan
+                <span class="hint">(maks. 200 karakter)</span>
+                <span class="count" id="excerptCount" style="margin-left:auto;">0/200</span>
+              </label>
+              <textarea class="f-textarea" id="postExcerpt" rows="3" placeholder="Tulis ringkasan menarik yang membuat pembaca ingin melanjutkan membaca..." maxlength="200" oninput="updateExcerptCount(this)"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: SEO -->
+        <div class="section-card">
+          <div class="sc-header">
+            <div class="sc-icon" style="background:#f0fdf4;color:#15803d;"><i class="bi bi-search"></i></div>
+            <div><div class="sc-title">SEO &amp; Meta</div><div class="sc-sub">Optimalkan artikel untuk mesin pencari</div></div>
+          </div>
+          <div class="sc-body">
+            <div class="form-group">
+              <label class="form-label">
+                Meta Title <span class="hint">(opsional, default: judul artikel)</span>
+                <span class="count" id="metaTitleCount">0/60</span>
+              </label>
+              <input type="text" class="f-input" id="metaTitle" placeholder="Judul untuk mesin pencari..." maxlength="60" oninput="updateSeoPreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                Meta Description
+                <span class="count" id="metaDescCount">0/160</span>
+              </label>
+              <textarea class="f-textarea" id="metaDesc" rows="2" placeholder="Deskripsi singkat untuk mesin pencari (Google, Bing)..." maxlength="160" oninput="updateSeoPreview()"></textarea>
+            </div>
+            <!-- SEO Preview -->
+            <div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:6px;"><i class="bi bi-eye me-1"></i>Pratinjau Google</div>
+              <div class="seo-preview-box">
+                <div class="seo-prev-url" id="seoUrl">learnhub.id › blog › judul-artikel-anda</div>
+                <div class="seo-prev-title" id="seoTitle">Judul Artikel Anda — LearnHub</div>
+                <div class="seo-prev-desc" id="seoDesc">Tulis meta description yang menarik untuk meningkatkan click-through rate di halaman hasil pencarian Google.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.main col -->
+
+      <!-- ══ SIDE PANEL ══ -->
+      <div class="side-panel">
+
+        <!-- Status Publikasi -->
+        <div class="side-card">
+          <div class="sc2-header"><i class="bi bi-toggle-on"></i><span class="sc2-title">Status Publikasi</span></div>
+          <div class="sc2-body">
+            <div class="status-options">
+              <label class="status-opt selected" onclick="selectStatus(this,'published')">
+                <input type="radio" name="pubStatus" value="published" checked>
+                <span class="status-dot published"></span>
+                <div><div class="status-lbl">Publikasikan</div><div class="status-desc">Langsung tayang</div></div>
+              </label>
+              <label class="status-opt" onclick="selectStatus(this,'draft')">
+                <input type="radio" name="pubStatus" value="draft">
+                <span class="status-dot draft"></span>
+                <div><div class="status-lbl">Simpan Draft</div><div class="status-desc">Belum ditayangkan</div></div>
+              </label>
+              <label class="status-opt" onclick="selectStatus(this,'scheduled')">
+                <input type="radio" name="pubStatus" value="scheduled">
+                <span class="status-dot scheduled"></span>
+                <div><div class="status-lbl">Jadwalkan</div><div class="status-desc">Tayang otomatis</div></div>
+              </label>
+            </div>
+            <div class="schedule-wrap" id="scheduleWrap">
+              <label><i class="bi bi-calendar-event-fill me-1"></i>Waktu Tayang</label>
+              <input type="datetime-local">
+            </div>
+          </div>
+        </div>
+
+        <!-- Kategori & Tag -->
+        <div class="side-card">
+          <div class="sc2-header"><i class="bi bi-tags-fill"></i><span class="sc2-title">Kategori &amp; Tag</span></div>
+          <div class="sc2-body">
+            <div class="form-group">
+              <label class="form-label">Kategori <span class="req">*</span></label>
+              <select class="f-sel">
+                <option value="">— Pilih kategori —</option>
+                <option>Tutorial</option>
+                <option>Tips &amp; Trik</option>
+                <option>Berita</option>
+                <option>Panduan Karir</option>
+                <option>Update Platform</option>
+                <option>Inspirasi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Penulis <span class="req">*</span></label>
+              <select class="f-sel">
+                <option>Ahmad Santoso (Admin)</option>
+                <option>Budi Santoso (Instruktur)</option>
+                <option>Siti Rahma (Instruktur)</option>
+                <option>Rina Kusuma (Instruktur)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Tags <span class="hint">(Enter untuk tambah)</span></label>
+              <div class="tags-wrap" id="tagsWrap" onclick="this.querySelector('input').focus()">
+                <input type="text" placeholder="Tulis tag lalu Enter..." id="tagInput" onkeydown="handleTagKeydown(event)">
+              </div>
+              <div class="tag-hint"><i class="bi bi-lightbulb-fill" style="color:var(--warning);"></i> cth: Laravel, PHP, Backend</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pengaturan -->
+        <div class="side-card">
+          <div class="sc2-header"><i class="bi bi-sliders"></i><span class="sc2-title">Pengaturan Artikel</span></div>
+          <div class="sc2-body">
+            <div class="toggle-row">
+              <div class="toggle-info"><h6><i class="bi bi-star-fill me-1" style="color:#a16207;font-size:12px;"></i>Artikel Unggulan</h6><p>Tampil di bagian hero blog</p></div>
+              <label class="toggle-sw"><input type="checkbox"><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info"><h6><i class="bi bi-chat-dots-fill me-1" style="color:var(--primary);font-size:12px;"></i>Izinkan Komentar</h6><p>Pembaca bisa berkomentar</p></div>
+              <label class="toggle-sw"><input type="checkbox" checked><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info"><h6><i class="bi bi-share-fill me-1" style="color:var(--success);font-size:12px;"></i>Tombol Bagikan</h6><p>Tampil di akhir artikel</p></div>
+              <label class="toggle-sw"><input type="checkbox" checked><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info"><h6><i class="bi bi-eye-fill me-1" style="color:var(--teal,#0d9488);font-size:12px;"></i>Artikel Terkait</h6><p>Rekomendasi di bawah artikel</p></div>
+              <label class="toggle-sw"><input type="checkbox" checked><span class="toggle-track"><span class="toggle-thumb"></span></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="side-card">
+          <div class="sc2-header"><i class="bi bi-info-circle-fill"></i><span class="sc2-title">Ringkasan</span></div>
+          <div class="sc2-body">
+            <div class="sum-row"><span class="sum-lbl">Status</span><span class="sum-val purple" id="sumStatus">Publikasikan</span></div>
+            <div class="sum-row"><span class="sum-lbl">Kategori</span><span class="sum-val" id="sumCat">—</span></div>
+            <div class="sum-row"><span class="sum-lbl">Kata</span><span class="sum-val" id="sumWords">0</span></div>
+            <div class="sum-row"><span class="sum-lbl">Est. Baca</span><span class="sum-val" id="sumRead">0 mnt</span></div>
+            <div class="sum-row"><span class="sum-lbl">Gambar Sampul</span><span class="sum-val success" id="sumCover">Belum upload</span></div>
+          </div>
+        </div>
+
+      </div><!-- /.side-panel -->
+
+    </div><!-- /.editor-layout -->
+
+  </main>
+
+</div><!-- /.main-area -->
+
+<!-- STICKY ACTION BAR -->
+<div class="action-bar" id="actionBar">
+  <div class="autosave-status">
+    <span class="autosave-dot" id="autosaveDot"></span>
+    <span id="autosaveText">Draft tersimpan otomatis</span>
+  </div>
+  <div class="ab-right">
+    <a href="../blog.html" class="btn-cancel"><i class="bi bi-x-lg"></i> Batalkan</a>
+    <button class="btn-preview-ab" onclick="showToast('Membuka preview artikel...','info')"><i class="bi bi-eye-fill"></i> Preview</button>
+    <button class="btn-draft" onclick="saveDraft()"><i class="bi bi-floppy-fill"></i> Simpan Draft</button>
+    <button class="btn-publish" id="btnPublish" onclick="publishArticle()">
+      <i class="bi bi-send-fill"></i>
+      <span class="btn-text">Publikasikan</span>
+      <span class="spin" id="publishSpin"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="m-icon" style="background:var(--success-light);border:2px solid rgba(16,185,129,.15);">
+      <div class="m-icon-ring" style="border-color:rgba(16,185,129,.2);"></div>
+      <i class="bi bi-check-circle-fill" style="color:var(--success);"></i>
+    </div>
+    <h3 class="m-title">Artikel Dipublikasikan! 🎉</h3>
+    <p class="m-desc">Artikel Anda berhasil dipublikasikan dan sudah bisa diakses oleh pembaca di seluruh Indonesia.</p>
+    <div class="m-actions">
+      <button class="btn-mcancel" onclick="window.location.href='../blog.html'"><i class="bi bi-list-ul me-1"></i>Daftar Artikel</button>
+      <button class="btn-mgo" onclick="showToast('Membuka artikel yang baru dipublikasikan...','info');closeModal('successModal')"><i class="bi bi-box-arrow-up-right me-1"></i>Lihat Artikel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Sidebar ── */
+const sidebar=document.getElementById('sidebar'),mainArea=document.getElementById('mainArea'),backdrop=document.getElementById('sidebarBackdrop'),hamburgerIcon=document.getElementById('hamburgerIcon'),actionBar=document.getElementById('actionBar');
+let sbCollapsed=false;
+const isMobile=()=>window.innerWidth<992;
+function toggleSidebar(){if(isMobile()){const o=sidebar.classList.contains('mobile-open');if(o)closeMobileSidebar();else{sidebar.classList.add('mobile-open');backdrop.classList.add('show');document.body.classList.add('no-scroll');}}else{sbCollapsed=!sbCollapsed;sidebar.classList.toggle('collapsed',sbCollapsed);mainArea.classList.toggle('sb-col',sbCollapsed);actionBar.classList.toggle('sb-col',sbCollapsed);hamburgerIcon.className=sbCollapsed?'bi bi-layout-sidebar':'bi bi-list';}}
+function closeMobileSidebar(){sidebar.classList.remove('mobile-open');backdrop.classList.remove('show');document.body.classList.remove('no-scroll');}
+window.addEventListener('resize',()=>{if(!isMobile())closeMobileSidebar();});
+document.querySelectorAll('.nav-lnk').forEach(l=>{l.addEventListener('click',function(e){if(!this.getAttribute('href')||this.getAttribute('href')==='#')e.preventDefault();document.querySelectorAll('.nav-lnk').forEach(x=>x.classList.remove('active'));this.classList.add('active');if(isMobile())closeMobileSidebar();});});
+
+/* ── CKEditor 5 init ── */
+const {ClassicEditor,Essentials,Bold,Italic,Underline,Strikethrough,Code,Subscript,Superscript,Font,FontColor,FontBackgroundColor,Heading,BlockQuote,Link,Image,ImageCaption,ImageStyle,ImageToolbar,ImageUpload,Base64UploadAdapter,List,ListProperties,Indent,IndentBlock,MediaEmbed,HorizontalLine,Table,TableToolbar,TableProperties,TableCellProperties,Alignment,SourceEditing,WordCount,Highlight,CodeBlock}=CKEDITOR;
+
+let editorInstance=null;
+
+ClassicEditor.create(document.getElementById('ckEditorInstance'),{
+  plugins:[
+    Essentials,Bold,Italic,Underline,Strikethrough,Code,Subscript,Superscript,
+    Font,FontColor,FontBackgroundColor,
+    Heading,BlockQuote,Link,
+    Image,ImageCaption,ImageStyle,ImageToolbar,ImageUpload,Base64UploadAdapter,
+    List,ListProperties,Indent,IndentBlock,
+    MediaEmbed,HorizontalLine,
+    Table,TableToolbar,TableProperties,TableCellProperties,
+    Alignment,SourceEditing,WordCount,Highlight,CodeBlock
+  ],
+  toolbar:{
+    items:[
+      'heading','|',
+      'bold','italic','underline','strikethrough','|',
+      'fontColor','fontBackgroundColor','highlight','|',
+      'alignment','|',
+      'numberedList','bulletedList','|',
+      'outdent','indent','|',
+      'link','imageUpload','mediaEmbed','blockQuote','insertTable','horizontalLine','codeBlock','|',
+      'undo','redo','|',
+      'sourceEditing'
+    ],
+    shouldNotGroupWhenFull:false
+  },
+  heading:{
+    options:[
+      {model:'paragraph',title:'Paragraf',class:'ck-heading_paragraph'},
+      {model:'heading2',view:'h2',title:'Heading 2',class:'ck-heading_heading2'},
+      {model:'heading3',view:'h3',title:'Heading 3',class:'ck-heading_heading3'},
+      {model:'heading4',view:'h4',title:'Heading 4',class:'ck-heading_heading4'},
+    ]
+  },
+  image:{
+    toolbar:['imageTextAlternative','imageStyle:inline','imageStyle:block','imageStyle:side','|','toggleImageCaption']
+  },
+  table:{
+    contentToolbar:['tableColumn','tableRow','mergeTableCells','tableProperties','tableCellProperties']
+  },
+  list:{properties:{styles:true,startIndex:true,reversed:true}},
+  wordCount:{
+    onUpdate(stats){
+      const w=stats.words,c=stats.characters;
+      document.getElementById('wordCount').textContent=w;
+      document.getElementById('charCount').textContent=c;
+      const rt=Math.max(1,Math.ceil(w/200));
+      document.getElementById('readTime').textContent=rt+' menit baca';
+      document.getElementById('sumWords').textContent=w;
+      document.getElementById('sumRead').textContent=rt+' mnt';
+    }
+  },
+  placeholder:'Mulai tulis konten artikel Anda di sini...\n\nGunakan toolbar di atas untuk menambahkan Heading, Bold, Italic, gambar, tabel, kode, dan lainnya.',
+  language:'id'
+}).then(editor=>{
+  editorInstance=editor;
+  /* Auto-save simulation */
+  editor.model.document.on('change:data',()=>{
+    triggerAutosave();
+  });
+}).catch(err=>{
+  console.warn('CKEditor failed, falling back to textarea:',err);
+  /* Fallback textarea */
+  const wrap=document.querySelector('.ck-editor-wrap');
+  wrap.innerHTML='<textarea class="f-textarea" style="min-height:380px;border-radius:0 0 10px 10px;border:none;border-top:1px solid var(--border);font-size:14px;line-height:1.75;padding:20px 24px;" placeholder="Mulai tulis konten artikel Anda di sini..."></textarea>';
+});
+
+/* ── Title → slug ── */
+function onTitleInput(val){
+  const slug=slugify(val);
+  document.getElementById('slugVal').textContent=slug||'judul-artikel-anda';
+  document.getElementById('slugInput').value=slug;
+  /* Update SEO preview */
+  updateSeoPreview();
+}
+function slugify(val){
+  return val.toLowerCase()
+    .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
+    .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u')
+    .replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+}
+
+/* ── Slug edit toggle ── */
+let slugEditing=false;
+function editSlug(){
+  slugEditing=!slugEditing;
+  const input=document.getElementById('slugInput');
+  const btn=document.querySelector('.slug-edit-btn');
+  input.style.display=slugEditing?'block':'none';
+  btn.innerHTML=slugEditing?'<i class="bi bi-check-lg"></i> Simpan':'<i class="bi bi-pencil-fill"></i> Edit';
+  if(slugEditing){input.focus();input.value=document.getElementById('slugVal').textContent;}
+}
+
+/* ── Cover upload ── */
+function handleCoverUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>2*1024*1024){showToast('Ukuran file melebihi 2MB','error');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const prev=document.getElementById('coverPreview');
+    prev.src=e.target.result;
+    prev.style.display='block';
+    document.getElementById('coverPlaceholder').style.display='none';
+    document.getElementById('coverArea').classList.add('has-image');
+    document.getElementById('altInputWrap').classList.add('visible');
+    document.getElementById('sumCover').textContent='✓ '+file.name;
+    document.getElementById('sumCover').style.color='var(--success)';
+    showToast('Gambar sampul berhasil diupload','success');
+  };
+  reader.readAsDataURL(file);
+}
+function removeCover(){
+  document.getElementById('coverInput').value='';
+  document.getElementById('coverPreview').style.display='none';
+  document.getElementById('coverPreview').src='';
+  document.getElementById('coverPlaceholder').style.display='flex';
+  document.getElementById('coverArea').classList.remove('has-image');
+  document.getElementById('altInputWrap').classList.remove('visible');
+  document.getElementById('sumCover').textContent='Belum upload';
+  document.getElementById('sumCover').style.color='';
+  showToast('Gambar sampul dihapus','info');
+}
+
+/* ── Drag & Drop cover ── */
+const coverArea=document.getElementById('coverArea');
+coverArea.addEventListener('dragover',e=>{e.preventDefault();coverArea.style.borderColor='var(--purple)';});
+coverArea.addEventListener('dragleave',()=>{coverArea.style.borderColor='';});
+coverArea.addEventListener('drop',e=>{
+  e.preventDefault();
+  coverArea.style.borderColor='';
+  const files=e.dataTransfer.files;
+  if(files.length){
+    const dt=new DataTransfer();dt.items.add(files[0]);
+    document.getElementById('coverInput').files=dt.files;
+    handleCoverUpload(document.getElementById('coverInput'));
+  }
+});
+
+/* ── Excerpt counter ── */
+function updateExcerptCount(el){
+  document.getElementById('excerptCount').textContent=el.value.length+'/200';
+}
+
+/* ── Meta counters ── */
+document.getElementById('metaTitle').addEventListener('input',function(){
+  document.getElementById('metaTitleCount').textContent=this.value.length+'/60';
+  updateSeoPreview();
+});
+document.getElementById('metaDesc').addEventListener('input',function(){
+  document.getElementById('metaDescCount').textContent=this.value.length+'/160';
+  updateSeoPreview();
+});
+
+/* ── SEO Preview ── */
+function updateSeoPreview(){
+  const slug=document.getElementById('slugVal').textContent||'judul-artikel-anda';
+  const title=document.getElementById('metaTitle').value||document.getElementById('postTitle').value||'Judul Artikel';
+  const desc=document.getElementById('metaDesc').value||'Deskripsi artikel untuk mesin pencari akan tampil di sini...';
+  document.getElementById('seoUrl').textContent=`learnhub.id › blog › ${slug}`;
+  document.getElementById('seoTitle').textContent=`${title} — LearnHub`;
+  document.getElementById('seoDesc').textContent=desc;
+}
+
+/* ── Tags ── */
+function handleTagKeydown(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const val=e.target.value.replace(',','').trim();
+    if(!val)return;
+    const pill=document.createElement('span');
+    pill.className='tag-pill';
+    pill.innerHTML=`${val} <i class="bi bi-x" onclick="this.parentElement.remove()"></i>`;
+    const wrap=document.getElementById('tagsWrap');
+    wrap.insertBefore(pill,document.getElementById('tagInput'));
+    e.target.value='';
+  }
+}
+
+/* ── Status select ── */
+function selectStatus(label,val){
+  document.querySelectorAll('.status-opt').forEach(l=>l.classList.remove('selected'));
+  label.classList.add('selected');
+  const schedWrap=document.getElementById('scheduleWrap');
+  schedWrap.classList.toggle('show',val==='scheduled');
+  const labels={published:'Publikasikan',draft:'Draft',scheduled:'Terjadwal'};
+  document.getElementById('sumStatus').textContent=labels[val]||val;
+}
+
+/* ── Auto-save simulation ── */
+let autosaveTimer=null;
+function triggerAutosave(){
+  const dot=document.getElementById('autosaveDot'),txt=document.getElementById('autosaveText');
+  dot.classList.add('saving');txt.textContent='Menyimpan draft...';
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>{
+    dot.classList.remove('saving');txt.textContent='Draft tersimpan otomatis · '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  },1200);
+}
+
+/* ── Sidebar category → summary ── */
+document.querySelector('.f-sel:first-of-type')?.addEventListener('change',function(){
+  document.getElementById('sumCat').textContent=this.value||'—';
+});
+
+/* ── Save Draft ── */
+function saveDraft(){
+  triggerAutosave();
+  showToast('Draft berhasil disimpan','success');
+}
+
+/* ── Publish ── */
+function publishArticle(){
+  const title=document.getElementById('postTitle').value.trim();
+  if(!title){showToast('Judul artikel wajib diisi','error');document.getElementById('postTitle').focus();return;}
+  const btn=document.getElementById('btnPublish');
+  const spin=document.getElementById('publishSpin');
+  btn.querySelector('.btn-text').textContent='Memproses...';
+  spin.style.display='inline-block';
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.querySelector('.btn-text').textContent='Publikasikan';
+    spin.style.display='none';
+    btn.disabled=false;
+    showModal('successModal');
+  },1800);
+}
+
+/* ── Modals ── */
+function showModal(id){document.getElementById(id).classList.add('show');document.body.classList.add('no-scroll');}
+function closeModal(id){document.getElementById(id).classList.remove('show');document.body.classList.remove('no-scroll');}
+
+/* ── Toast ── */
+function showToast(msg,type='success'){
+  const C={success:{bg:'#ecfdf5',color:'#10b981',border:'rgba(16,185,129,.3)',icon:'check-circle-fill'},info:{bg:'#eff6ff',color:'#2563eb',border:'rgba(37,99,235,.3)',icon:'info-circle-fill'},error:{bg:'#fef2f2',color:'#ef4444',border:'rgba(239,68,68,.3)',icon:'exclamation-circle-fill'}};
+  const c=C[type]||C.success;
+  const t=document.createElement('div');
+  t.style.cssText=`position:fixed;top:76px;right:24px;z-index:9999;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.12);background:${c.bg};color:${c.color};border:1px solid ${c.border};transform:translateX(120%);transition:transform .35s cubic-bezier(.34,1.4,.64,1);max-width:360px;`;
+  t.innerHTML=`<i class="bi bi-${c.icon}" style="font-size:17px;flex-shrink:0;"></i><span>${msg}</span>`;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.style.transform='translateX(0)');
+  setTimeout(()=>{t.style.transform='translateX(120%)';setTimeout(()=>t.remove(),380);},3500);
+}
+
+/* ── ESC ── */
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.show').forEach(m=>m.classList.remove('show'));document.body.classList.remove('no-scroll');}});
+</script>
+</body>
+</html>
