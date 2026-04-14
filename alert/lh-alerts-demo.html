@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LH Alerts — LearnHub UI Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#2563eb;--primary-l:#3b82f6;--primary-xl:#eff6ff;
+      --success:#10b981;--success-l:#ecfdf5;
+      --warning:#f59e0b;--warning-l:#fffbeb;
+      --danger:#ef4444;--danger-l:#fef2f2;
+      --purple:#8b5cf6;--purple-l:#f5f3ff;
+      --teal:#0d9488;--teal-l:#f0fdfa;
+      --sidebar-bg:#0f172a;--body-bg:#f1f5f9;
+      --border:#e2e8f0;--text:#0f172a;--muted:#64748b;--xmuted:#94a3b8;
+      --radius:14px;--tr:all .25s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Poppins',sans-serif;background:var(--body-bg);color:var(--text);min-height:100vh;}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:5px;}
+
+    /* TOPBAR */
+    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .brand-icon{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--primary-l));display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:800;box-shadow:0 4px 14px rgba(37,99,235,.35);animation:brandPop 3s ease-in-out infinite;}
+    @keyframes brandPop{0%,100%{box-shadow:0 4px 14px rgba(37,99,235,.35);}50%{box-shadow:0 4px 22px rgba(37,99,235,.55),0 0 0 6px rgba(37,99,235,.08);}}
+    .brand-name{font-size:16px;font-weight:700;color:var(--text);}
+    .brand-sub{font-size:11px;color:var(--xmuted);font-weight:500;}
+    .topbar-badge{padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,var(--primary),#1e40af);color:#fff;font-size:11.5px;font-weight:700;}
+    .back-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;text-decoration:none;transition:var(--tr);}
+    .back-btn:hover{border-color:var(--primary-l);color:var(--primary);background:var(--primary-xl);}
+
+    /* PAGE */
+    .page{max-width:1160px;margin:0 auto;padding:40px 24px 80px;}
+
+    /* HERO */
+    .hero{text-align:center;margin-bottom:56px;}
+    .hero-tag{display:inline-flex;align-items:center;gap:7px;background:var(--primary-xl);color:var(--primary);padding:6px 16px;border-radius:30px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:18px;border:1px solid rgba(37,99,235,.2);}
+    .hero-title{font-size:clamp(26px,4.5vw,42px);font-weight:800;color:var(--text);line-height:1.2;margin-bottom:12px;letter-spacing:-.5px;}
+    .hero-title span{background:linear-gradient(135deg,var(--primary),#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-desc{font-size:15px;color:var(--muted);max-width:520px;margin:0 auto 26px;line-height:1.75;}
+    .hero-code{display:inline-flex;align-items:center;gap:10px;background:#0f172a;color:#e2e8f0;padding:11px 22px;border-radius:10px;font-family:'DM Mono',monospace;font-size:12.5px;border:1px solid rgba(255,255,255,.07);}
+    .kw{color:#93c5fd;}.fn{color:#86efac;}.p{color:#fde68a;}
+
+    /* SECTION */
+    .section{margin-bottom:48px;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    /* SECTION LABEL */
+    .sec-label{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+    .sec-num{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#1e40af);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sec-title{font-size:19px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+    .sec-sub{font-size:12.5px;color:var(--xmuted);font-weight:500;font-family:'DM Mono',monospace;}
+
+    /* CARDS GRID */
+    .grid{display:grid;gap:16px;}
+    .grid-3{grid-template-columns:repeat(3,1fr);}
+    .grid-4{grid-template-columns:repeat(4,1fr);}
+    .grid-2{grid-template-columns:repeat(2,1fr);}
+    @media(max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+    @media(max-width:560px){.grid-3,.grid-4,.grid-2{grid-template-columns:1fr;}}
+
+    /* DEMO CARD */
+    .dc{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+    .dc:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1);}
+    .dc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--dc-stripe,linear-gradient(90deg,var(--primary),var(--primary-l)));border-radius:var(--radius) var(--radius) 0 0;}
+    .dc.s-success{--dc-stripe:linear-gradient(90deg,var(--success),#34d399);}
+    .dc.s-danger {--dc-stripe:linear-gradient(90deg,var(--danger),#f87171);}
+    .dc.s-warning{--dc-stripe:linear-gradient(90deg,var(--warning),#fbbf24);}
+    .dc.s-info   {--dc-stripe:linear-gradient(90deg,var(--primary),var(--primary-l));}
+    .dc.s-teal   {--dc-stripe:linear-gradient(90deg,var(--teal),#2dd4bf);}
+    .dc.s-purple {--dc-stripe:linear-gradient(90deg,var(--purple),#a78bfa);}
+    .dc.s-indigo {--dc-stripe:linear-gradient(90deg,#6366f1,#818cf8);}
+    .dc.s-orange {--dc-stripe:linear-gradient(90deg,#f97316,#fb923c);}
+
+    .dc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .dc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .dc-title{font-size:14px;font-weight:700;color:var(--text);}
+    .dc-desc{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+
+    /* code block */
+    .dc-code{background:#0f172a;border-radius:9px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:11.5px;color:#94a3b8;margin-bottom:14px;overflow-x:auto;white-space:pre;line-height:1.75;border:1px solid rgba(255,255,255,.05);}
+    .dc-code .kw{color:#93c5fd;}.dc-code .fn{color:#86efac;}.dc-code .str{color:#fde68a;}.dc-code .co{color:#475569;}
+
+    /* demo buttons */
+    .dbtn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;border:none;transition:var(--tr);position:relative;overflow:hidden;}
+    .dbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-100%);transition:transform .45s ease;}
+    .dbtn:hover::after{transform:translateX(100%);}
+    .dbtn:hover{transform:translateY(-2px);}
+    .dbtn:active{transform:scale(.96);}
+    .dbtn.blue  {background:linear-gradient(135deg,var(--primary),var(--primary-l));color:#fff;box-shadow:0 3px 12px rgba(37,99,235,.28);}
+    .dbtn.green {background:linear-gradient(135deg,var(--success),#34d399);color:#fff;box-shadow:0 3px 12px rgba(16,185,129,.28);}
+    .dbtn.red   {background:linear-gradient(135deg,var(--danger),#f87171);color:#fff;box-shadow:0 3px 12px rgba(239,68,68,.28);}
+    .dbtn.gold  {background:linear-gradient(135deg,var(--warning),#fbbf24);color:#fff;box-shadow:0 3px 12px rgba(245,158,11,.28);}
+    .dbtn.teal  {background:linear-gradient(135deg,var(--teal),#2dd4bf);color:#fff;box-shadow:0 3px 12px rgba(13,148,136,.28);}
+    .dbtn.purple{background:linear-gradient(135deg,var(--purple),#a78bfa);color:#fff;box-shadow:0 3px 12px rgba(139,92,246,.28);}
+    .dbtn.indigo{background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;box-shadow:0 3px 12px rgba(99,102,241,.28);}
+    .dbtn.orange{background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;box-shadow:0 3px 12px rgba(249,115,22,.28);}
+    .dbtn.ghost {background:#fff;color:var(--muted);border:1.5px solid var(--border);}
+    .dbtn.ghost:hover{border-color:var(--primary-l);color:var(--primary);background:var(--primary-xl);}
+    .btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+    /* result area */
+    .result{background:var(--body-bg);border:1.5px dashed var(--border);border-radius:9px;padding:11px 14px;min-height:42px;font-size:12.5px;color:var(--muted);margin-top:12px;transition:all .25s;}
+    .result.ok {background:var(--success-l);border-color:#86efac;color:#065f46;}
+    .result.fail{background:var(--danger-l);border-color:#fca5a5;color:#991b1b;}
+    .result.inf{background:var(--primary-xl);border-color:#93c5fd;color:#1e40af;}
+
+    /* position grid */
+    .pos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .pos-btn{padding:10px 6px;border-radius:9px;border:1.5px solid var(--border);background:#fff;font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;transition:var(--tr);display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .pos-btn i{font-size:15px;color:var(--primary-l);}
+    .pos-btn:hover{background:var(--primary-xl);border-color:var(--primary-l);color:var(--primary);}
+
+    /* API table */
+    .api-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+    .api-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+    .api-tbl th{background:#f8fafc;padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--xmuted);letter-spacing:.06em;text-transform:uppercase;border-bottom:2px solid var(--border);}
+    .api-tbl td{padding:12px 16px;border-bottom:1px solid var(--body-bg);color:var(--muted);vertical-align:top;}
+    .api-tbl tr:last-child td{border-bottom:none;}
+    .api-tbl tr:hover td{background:#fafbff;}
+    .api-tbl code{background:var(--primary-xl);color:var(--primary);padding:2px 7px;border-radius:5px;font-family:'DM Mono',monospace;font-size:11.5px;}
+    .api-tbl .method{font-weight:700;color:var(--text);white-space:nowrap;}
+    .api-tbl .ret{color:var(--teal);font-family:'DM Mono',monospace;font-size:11.5px;}
+
+    /* inline demo area */
+    #inline-area{display:flex;flex-direction:column;gap:10px;min-height:50px;}
+
+    /* footer */
+    .page-footer{margin-top:64px;text-align:center;font-size:12.5px;color:var(--xmuted);border-top:1px solid var(--border);padding-top:32px;}
+    .page-footer strong{color:var(--primary);}
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">LH</div>
+    <div>
+      <div class="brand-name">LearnHub</div>
+      <div class="brand-sub">LMS Platform v2.0</div>
+    </div>
+    <span class="topbar-badge">LH Alerts v1.0</span>
+  </div>
+  <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i>Dashboard</a>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag"><i class="bi bi-bell-fill"></i> UI Component Library</div>
+    <h1 class="hero-title">LH Alerts — <span>LearnHub</span> Notification System</h1>
+    <p class="hero-desc">Library notifikasi & dialog resmi LearnHub LMS. Toast, dialog, confirm, prompt, loading, dan inline alert dengan animasi smooth yang sesuai design system admin panel.</p>
+    <div class="hero-code">
+      <span class="kw">import</span> <span> lh-alerts.js</span>
+      &nbsp;→&nbsp;
+      <span class="fn">LH</span><span class="p">.</span><span class="fn">toast</span><span class="p">()</span>
+      &nbsp;·&nbsp;
+      <span class="fn">LH</span><span class="p">.</span><span class="fn">dialog</span><span class="p">()</span>
+      &nbsp;·&nbsp;
+      <span class="fn">LH</span><span class="p">.</span><span class="fn">confirm</span><span class="p">()</span>
+    </div>
+  </div>
+
+  <!-- ══ 1. TOAST ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">1</div>
+      <div>
+        <div class="sec-title">Toast Notifications</div>
+        <div class="sec-sub">LH.toast() · LH.success() · LH.error() · LH.warning() · LH.info()</div>
+      </div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <!-- success -->
+      <div class="dc s-success" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--success-l);color:var(--success);"><i class="bi bi-check-circle-fill"></i></div><div class="dc-title">Success</div></div>
+        <div class="dc-desc">Aksi berhasil — data tersimpan, upload selesai, dll.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">success</span>(<span class="str">'Data tersimpan!'</span>);</div>
+        <button class="dbtn green" onclick="LH.success('Data kursus berhasil diperbarui.','Tersimpan!')"><i class="bi bi-check2-circle"></i> Coba</button>
+      </div>
+      <!-- error -->
+      <div class="dc s-danger" style="animation-delay:.06s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--danger-l);color:var(--danger);"><i class="bi bi-x-circle-fill"></i></div><div class="dc-title">Error</div></div>
+        <div class="dc-desc">Aksi gagal — koneksi error, validasi gagal, dll.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">error</span>(<span class="str">'Koneksi gagal!'</span>);</div>
+        <button class="dbtn red" onclick="LH.error('Koneksi ke server terputus. Coba lagi.','Server Error')"><i class="bi bi-x-circle"></i> Coba</button>
+      </div>
+      <!-- warning -->
+      <div class="dc s-warning" style="animation-delay:.12s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--warning-l);color:var(--warning);"><i class="bi bi-exclamation-triangle-fill"></i></div><div class="dc-title">Warning</div></div>
+        <div class="dc-desc">Peringatan — sesi hampir habis, data tidak lengkap.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">warning</span>(<span class="str">'Sesi hampir habis!'</span>);</div>
+        <button class="dbtn gold" onclick="LH.warning('Sesi Anda akan berakhir dalam 5 menit.','Perhatian!')"><i class="bi bi-exclamation-triangle"></i> Coba</button>
+      </div>
+      <!-- info -->
+      <div class="dc s-info" style="animation-delay:.18s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-info-circle-fill"></i></div><div class="dc-title">Info</div></div>
+        <div class="dc-desc">Informasi — pembaruan sistem, notifikasi umum.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">info</span>(<span class="str">'Pembaruan tersedia'</span>);</div>
+        <button class="dbtn blue" onclick="LH.info('LearnHub v2.1 tersedia untuk diperbarui.','Info Sistem')"><i class="bi bi-info-circle"></i> Coba</button>
+      </div>
+      <!-- teal -->
+      <div class="dc s-teal" style="animation-delay:.24s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--teal-l);color:var(--teal);"><i class="bi bi-lightning-charge-fill"></i></div><div class="dc-title">Teal</div></div>
+        <div class="dc-desc">Aksi khusus — proses berjalan, notifikasi sistem.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">toast</span>({type:<span class="str">'teal'</span>,message:...});</div>
+        <button class="dbtn teal" onclick="LH.toast({type:'teal',title:'Pembayaran Diproses',message:'Transaksi ORD-250406-0891 sedang diverifikasi.'})"><i class="bi bi-lightning-charge"></i> Coba</button>
+      </div>
+      <!-- purple -->
+      <div class="dc s-purple" style="animation-delay:.30s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--purple-l);color:var(--purple);"><i class="bi bi-stars"></i></div><div class="dc-title">Purple</div></div>
+        <div class="dc-desc">Notifikasi premium — badge, pencapaian, sertifikat.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">toast</span>({type:<span class="str">'purple'</span>,duration:<span class="str">6000</span>});</div>
+        <button class="dbtn purple" onclick="LH.toast({type:'purple',title:'Selamat! 🎉',message:'Sertifikat kursus Laravel Anda siap diunduh.',duration:6000})"><i class="bi bi-stars"></i> Coba</button>
+      </div>
+      <!-- indigo -->
+      <div class="dc s-indigo" style="animation-delay:.36s;">
+        <div class="dc-top"><div class="dc-icon" style="background:#eef2ff;color:#6366f1;"><i class="bi bi-grid-1x2-fill"></i></div><div class="dc-title">Indigo</div></div>
+        <div class="dc-desc">Notifikasi modul — komentar, kursus baru, artikel.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">toast</span>({type:<span class="str">'indigo'</span>});</div>
+        <button class="dbtn indigo" onclick="LH.toast({type:'indigo',title:'Komentar Baru',message:'12 komentar menunggu persetujuan Anda.'})"><i class="bi bi-chat-dots-fill"></i> Coba</button>
+      </div>
+      <!-- orange -->
+      <div class="dc s-orange" style="animation-delay:.42s;">
+        <div class="dc-top"><div class="dc-icon" style="background:#fff7ed;color:#f97316;"><i class="bi bi-images"></i></div><div class="dc-title">Orange</div></div>
+        <div class="dc-desc">Notifikasi media — upload, storage, media library.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">toast</span>({type:<span class="str">'orange'</span>});</div>
+        <button class="dbtn orange" onclick="LH.toast({type:'orange',title:'Upload Selesai',message:'3 file berhasil diunggah ke media library.'})"><i class="bi bi-cloud-upload-fill"></i> Coba</button>
+      </div>
+    </div>
+
+    <!-- Position grid -->
+    <div class="dc" style="animation-delay:.5s;">
+      <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-layout-text-window-reverse"></i></div><div class="dc-title">Posisi Toast — 6 Pilihan</div></div>
+      <div class="dc-desc">Klik posisi untuk melihat toast muncul di lokasi yang berbeda pada layar.</div>
+      <div class="pos-grid">
+        <button class="pos-btn" onclick="LH.toast({type:'success',title:'Top Left',message:'Pojok kiri atas',position:'top-left'})"><i class="bi bi-arrow-up-left"></i>Top Left</button>
+        <button class="pos-btn" onclick="LH.toast({type:'info',title:'Top Center',message:'Tengah atas',position:'top-center'})"><i class="bi bi-arrow-up"></i>Top Center</button>
+        <button class="pos-btn" onclick="LH.toast({type:'warning',title:'Top Right',message:'Pojok kanan atas',position:'top-right'})"><i class="bi bi-arrow-up-right"></i>Top Right</button>
+        <button class="pos-btn" onclick="LH.toast({type:'teal',title:'Bottom Left',message:'Pojok kiri bawah',position:'bottom-left'})"><i class="bi bi-arrow-down-left"></i>Bottom Left</button>
+        <button class="pos-btn" onclick="LH.toast({type:'purple',title:'Bottom Center',message:'Tengah bawah',position:'bottom-center'})"><i class="bi bi-arrow-down"></i>Bottom Center</button>
+        <button class="pos-btn" onclick="LH.toast({type:'error',title:'Bottom Right',message:'Pojok kanan bawah',position:'bottom-right'})"><i class="bi bi-arrow-down-right"></i>Bottom Right</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2. DIALOG ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">2</div>
+      <div>
+        <div class="sec-title">Dialog Modal</div>
+        <div class="sec-sub">LH.dialog() — Promise&lt;value&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <!-- info dialog -->
+      <div class="dc s-info" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-info-circle-fill"></i></div><div class="dc-title">Info Dialog</div></div>
+        <div class="dc-desc">Dialog informasi umum dengan satu tombol tutup.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">dialog</span>({
+  type: <span class="str">'info'</span>, icon: <span class="str">'shield'</span>,
+  title: <span class="str">'Informasi Akses'</span>,
+  buttons: [{label:<span class="str">'Mengerti'</span>, close:<span class="str">true</span>}]
+});</div>
+        <button class="dbtn blue" onclick="demoInfoDialog()"><i class="bi bi-info-circle"></i> Tampilkan</button>
+      </div>
+
+      <!-- success dialog -->
+      <div class="dc s-success" style="animation-delay:.08s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--success-l);color:var(--success);"><i class="bi bi-check-circle-fill"></i></div><div class="dc-title">Success Dialog</div></div>
+        <div class="dc-desc">Konfirmasi setelah aksi berhasil diselesaikan.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">dialog</span>({
+  type: <span class="str">'success'</span>, icon: <span class="str">'save'</span>,
+  title: <span class="str">'Tersimpan!'</span>,
+  buttons: [{label:<span class="str">'Lihat'</span>,...}, ...]
+});</div>
+        <button class="dbtn green" onclick="demoSuccessDialog()"><i class="bi bi-check2"></i> Tampilkan</button>
+      </div>
+
+      <!-- warning dialog -->
+      <div class="dc s-warning" style="animation-delay:.16s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--warning-l);color:var(--warning);"><i class="bi bi-exclamation-triangle-fill"></i></div><div class="dc-title">Warning Dialog</div></div>
+        <div class="dc-desc">Dialog peringatan untuk aksi yang berisiko atau terbatas.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">dialog</span>({
+  type: <span class="str">'warning'</span>, icon: <span class="str">'lock'</span>,
+  title: <span class="str">'Akses Terbatas'</span>,
+});</div>
+        <button class="dbtn gold" onclick="demoWarningDialog()"><i class="bi bi-exclamation-triangle"></i> Tampilkan</button>
+      </div>
+
+      <!-- multi-button dialog -->
+      <div class="dc s-purple" style="animation-delay:.24s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--purple-l);color:var(--purple);"><i class="bi bi-layout-three-columns"></i></div><div class="dc-title">Multi-Action Dialog</div></div>
+        <div class="dc-desc">Dialog dengan beberapa tombol — Promise resolve ke value masing-masing.</div>
+        <div class="dc-code"><span class="kw">const</span> action = <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">dialog</span>({
+  buttons: [
+    {label:<span class="str">'Draft'</span>, value:<span class="str">'draft'</span>},
+    {label:<span class="str">'Publish'</span>, value:<span class="str">'publish'</span>}
+  ]
+});</div>
+        <button class="dbtn purple" onclick="demoMultiDialog()"><i class="bi bi-ui-checks-grid"></i> Tampilkan</button>
+        <div class="result" id="r-multi">Klik untuk lihat hasil Promise...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 3. CONFIRM ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">3</div>
+      <div>
+        <div class="sec-title">Confirm Dialog</div>
+        <div class="sec-sub">LH.confirm() — Promise&lt;boolean&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <!-- delete confirm -->
+      <div class="dc s-danger" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--danger-l);color:var(--danger);"><i class="bi bi-trash3-fill"></i></div><div class="dc-title">Hapus Data</div></div>
+        <div class="dc-desc">Konfirmasi sebelum menghapus — resolve true/false.</div>
+        <div class="dc-code"><span class="kw">const</span> ok = <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">confirm</span>({
+  type: <span class="str">'error'</span>, icon: <span class="str">'delete'</span>,
+  confirmLabel: <span class="str">'Ya, Hapus'</span>,
+  confirmClass: <span class="str">'lh-btn-danger'</span>
+});</div>
+        <button class="dbtn red" onclick="demoDeleteConfirm()"><i class="bi bi-trash3"></i> Coba Hapus</button>
+        <div class="result" id="r-delete">Menunggu konfirmasi...</div>
+      </div>
+
+      <!-- logout confirm -->
+      <div class="dc s-warning" style="animation-delay:.08s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--warning-l);color:var(--warning);"><i class="bi bi-box-arrow-right"></i></div><div class="dc-title">Konfirmasi Logout</div></div>
+        <div class="dc-desc">Konfirmasi sebelum pengguna keluar dari sesi.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">confirm</span>({
+  type: <span class="str">'warning'</span>, icon: <span class="str">'logout'</span>,
+  title: <span class="str">'Keluar dari LearnHub?'</span>,
+  confirmClass: <span class="str">'lh-btn-warning'</span>
+});</div>
+        <button class="dbtn gold" onclick="demoLogoutConfirm()"><i class="bi bi-box-arrow-right"></i> Coba Logout</button>
+        <div class="result" id="r-logout">Menunggu konfirmasi...</div>
+      </div>
+
+      <!-- require checkbox confirm -->
+      <div class="dc s-danger" style="animation-delay:.16s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--danger-l);color:var(--danger);"><i class="bi bi-shield-fill-exclamation"></i></div><div class="dc-title">Konfirmasi + Checkbox</div></div>
+        <div class="dc-desc">Tombol konfirmasi aktif hanya setelah checkbox dicentang.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">confirm</span>({
+  requireCheck: <span class="str">true</span>,
+  checkLabel: <span class="str">'Saya memahami...'</span>
+});</div>
+        <button class="dbtn red" onclick="demoDangerConfirm()"><i class="bi bi-shield-fill-exclamation"></i> Aksi Berbahaya</button>
+        <div class="result" id="r-danger">Menunggu konfirmasi...</div>
+      </div>
+
+      <!-- reset password confirm -->
+      <div class="dc s-info" style="animation-delay:.24s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-key-fill"></i></div><div class="dc-title">Reset Password</div></div>
+        <div class="dc-desc">Konfirmasi kirim link reset password ke email.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">confirm</span>({
+  type: <span class="str">'info'</span>, icon: <span class="str">'key'</span>,
+  confirmLabel: <span class="str">'Kirim Link Reset'</span>,
+  confirmClass: <span class="str">'lh-btn-primary'</span>
+});</div>
+        <button class="dbtn blue" onclick="demoResetConfirm()"><i class="bi bi-key"></i> Reset Password</button>
+        <div class="result" id="r-reset">Menunggu konfirmasi...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 4. PROMPT ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">4</div>
+      <div>
+        <div class="sec-title">Prompt Input Dialog</div>
+        <div class="sec-sub">LH.prompt() — Promise&lt;string|null&gt;</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <!-- simple prompt -->
+      <div class="dc s-info" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-pencil-fill"></i></div><div class="dc-title">Input Sederhana</div></div>
+        <div class="dc-desc">Input teks — resolve ke string yang dimasukkan user.</div>
+        <div class="dc-code"><span class="kw">const</span> val = <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">prompt</span>({
+  title: <span class="str">'Nama Kategori Baru'</span>,
+  label: <span class="str">'Nama'</span>,
+  placeholder: <span class="str">'cth: Tutorial Laravel'</span>
+});</div>
+        <button class="dbtn blue" onclick="demoSimplePrompt()"><i class="bi bi-pencil"></i> Coba</button>
+        <div class="result" id="r-simple">Menunggu input...</div>
+      </div>
+
+      <!-- validated prompt -->
+      <div class="dc s-teal" style="animation-delay:.08s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--teal-l);color:var(--teal);"><i class="bi bi-check2-all"></i></div><div class="dc-title">Input + Validasi</div></div>
+        <div class="dc-desc">Input dengan custom validate function — pesan error inline.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">prompt</span>({
+  validate(v) {
+    <span class="kw">if</span>(!v.includes(<span class="str">'@'</span>))
+      <span class="kw">return</span> <span class="str">'Email tidak valid'</span>
+  }
+});</div>
+        <button class="dbtn teal" onclick="demoEmailPrompt()"><i class="bi bi-envelope"></i> Email Prompt</button>
+        <div class="result" id="r-email">Menunggu input...</div>
+      </div>
+
+      <!-- rename prompt -->
+      <div class="dc s-purple" style="animation-delay:.16s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--purple-l);color:var(--purple);"><i class="bi bi-fonts"></i></div><div class="dc-title">Rename / Edit Cepat</div></div>
+        <div class="dc-desc">Prompt dengan nilai default — untuk fitur rename kursus/artikel.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">prompt</span>({
+  title: <span class="str">'Rename Kursus'</span>,
+  defaultValue: <span class="str">'Laravel 11 Fullstack'</span>,
+  confirmLabel: <span class="str">'Simpan Nama'</span>
+});</div>
+        <button class="dbtn purple" onclick="demoRenamePrompt()"><i class="bi bi-fonts"></i> Rename</button>
+        <div class="result" id="r-rename">Menunggu input...</div>
+      </div>
+
+      <!-- password prompt -->
+      <div class="dc s-warning" style="animation-delay:.24s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--warning-l);color:var(--warning);"><i class="bi bi-lock-fill"></i></div><div class="dc-title">Input Password</div></div>
+        <div class="dc-desc">Input password dengan validasi kekuatan — min 8 karakter + huruf besar + angka.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">prompt</span>({
+  inputType: <span class="str">'password'</span>,
+  validate: v =>
+    v.length &lt; 8 ? <span class="str">'Min 8 karakter'</span> : <span class="str">null</span>
+});</div>
+        <button class="dbtn gold" onclick="demoPasswordPrompt()"><i class="bi bi-lock"></i> Ganti Password</button>
+        <div class="result" id="r-password">Menunggu input...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 5. LOADING ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">5</div>
+      <div>
+        <div class="sec-title">Loading Overlay</div>
+        <div class="sec-sub">LH.loading() — { close(), setMessage(), setTitle() }</div>
+      </div>
+    </div>
+    <div class="grid grid-3">
+      <!-- basic loading -->
+      <div class="dc s-info" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-hourglass-split"></i></div><div class="dc-title">Loading Dasar</div></div>
+        <div class="dc-desc">Loading overlay full-screen — auto close setelah 2.5 detik.</div>
+        <div class="dc-code"><span class="kw">const</span> ld = <span class="fn">LH</span>.<span class="fn">loading</span>({
+  title: <span class="str">'Memuat Data...'</span>
+});
+<span class="co">// Lalu:</span>
+ld.<span class="fn">close</span>();</div>
+        <button class="dbtn blue" onclick="demoBasicLoading()"><i class="bi bi-hourglass-split"></i> Tampilkan</button>
+      </div>
+
+      <!-- dynamic loading -->
+      <div class="dc s-teal" style="animation-delay:.1s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--teal-l);color:var(--teal);"><i class="bi bi-cloud-upload-fill"></i></div><div class="dc-title">Loading Dinamis</div></div>
+        <div class="dc-desc">Update pesan loading saat proses berlangsung via setMessage().</div>
+        <div class="dc-code">ld.<span class="fn">setTitle</span>(<span class="str">'Mengunggah...'</span>);
+ld.<span class="fn">setMessage</span>(<span class="str">'File 2/3 selesai'</span>);</div>
+        <button class="dbtn teal" onclick="demoDynamicLoading()"><i class="bi bi-cloud-upload"></i> Simulasi Upload</button>
+      </div>
+
+      <!-- cancellable loading -->
+      <div class="dc s-warning" style="animation-delay:.2s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--warning-l);color:var(--warning);"><i class="bi bi-x-circle-fill"></i></div><div class="dc-title">Loading + Batalkan</div></div>
+        <div class="dc-desc">Loading yang bisa dibatalkan user — closable: true.</div>
+        <div class="dc-code"><span class="fn">LH</span>.<span class="fn">loading</span>({
+  title: <span class="str">'Memproses...'</span>,
+  closable: <span class="str">true</span>
+});</div>
+        <button class="dbtn gold" onclick="LH.loading({title:'Memproses Data...',message:'Sedang menganalisis 3.284 transaksi',closable:true})"><i class="bi bi-x-circle"></i> Tampilkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 6. INLINE ALERT ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">6</div>
+      <div>
+        <div class="sec-title">Inline Alert</div>
+        <div class="sec-sub">LH.alert(selector, opts) — inject ke dalam elemen DOM</div>
+      </div>
+    </div>
+    <div class="dc">
+      <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-ui-checks"></i></div><div class="dc-title">Inject ke Elemen — Cocok untuk form validation</div></div>
+      <div class="dc-desc">Alert yang diinjeksikan ke dalam elemen — ideal untuk feedback dalam form, halaman kursus, atau panel admin.</div>
+      <div class="btn-row" style="margin-bottom:16px;">
+        <button class="dbtn green"  onclick="LH.alert('#inline-area',{type:'success',title:'Kursus Dipublikasikan',message:'Kursus Laravel 11 Fullstack kini aktif dan dapat diakses pelajar.'})"><i class="bi bi-check-circle"></i> Success</button>
+        <button class="dbtn red"    onclick="LH.alert('#inline-area',{type:'error',title:'Validasi Gagal',message:'Judul kursus minimal 10 karakter. Harga tidak boleh kosong.'})"><i class="bi bi-x-circle"></i> Error</button>
+        <button class="dbtn gold"   onclick="LH.alert('#inline-area',{type:'warning',title:'Perhatian',message:'Kursus belum memiliki video materi. Tambahkan setidaknya satu lesson.'})"><i class="bi bi-exclamation-triangle"></i> Warning</button>
+        <button class="dbtn blue"   onclick="LH.alert('#inline-area',{type:'info',title:'Info',message:'Sistem akan maintenance setiap Minggu 00.00–06.00 WIB.'})"><i class="bi bi-info-circle"></i> Info</button>
+        <button class="dbtn teal"   onclick="LH.alert('#inline-area',{type:'teal',title:'Diproses',message:'Permohonan instruktur sedang ditinjau oleh tim LearnHub (1-3 hari kerja).'})"><i class="bi bi-lightning-charge"></i> Teal</button>
+        <button class="dbtn purple" onclick="LH.alert('#inline-area',{type:'purple',title:'Sertifikat Siap',message:'Sertifikat completion kursus Flutter Anda siap untuk diunduh.'})"><i class="bi bi-award-fill"></i> Purple</button>
+        <button class="dbtn ghost"  onclick="document.getElementById('inline-area').innerHTML=''"><i class="bi bi-trash3"></i> Clear</button>
+      </div>
+      <div id="inline-area"></div>
+    </div>
+  </div>
+
+  <!-- ══ 7. SKENARIO NYATA ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">7</div>
+      <div>
+        <div class="sec-title">Skenario Nyata LMS</div>
+        <div class="sec-sub">Alur lengkap dari aksi admin sehari-hari</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <!-- simpan kursus -->
+      <div class="dc s-success" style="animation-delay:0s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--success-l);color:var(--success);"><i class="bi bi-floppy-fill"></i></div><div class="dc-title">Simpan Kursus</div></div>
+        <div class="dc-desc">Loading → API call → Success dialog → Toast kembali.</div>
+        <div class="dc-code"><span class="co">// loading → sukses → toast</span>
+<span class="kw">const</span> ld = <span class="fn">LH</span>.<span class="fn">loading</span>(...);
+<span class="co">// await API...</span>
+ld.<span class="fn">close</span>(() => <span class="fn">LH</span>.<span class="fn">dialog</span>(...));</div>
+        <button class="dbtn green" onclick="scenarioSaveCourse()"><i class="bi bi-floppy2"></i> Simulasi Simpan</button>
+      </div>
+
+      <!-- hapus pengguna -->
+      <div class="dc s-danger" style="animation-delay:.08s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--danger-l);color:var(--danger);"><i class="bi bi-person-x-fill"></i></div><div class="dc-title">Hapus Pengguna</div></div>
+        <div class="dc-desc">Confirm → Loading → Success toast atau Error toast.</div>
+        <div class="dc-code"><span class="kw">if</span>(<span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">confirm</span>(...)){
+  <span class="kw">const</span> ld = <span class="fn">LH</span>.<span class="fn">loading</span>(...);
+  ld.<span class="fn">close</span>(() =>
+    <span class="fn">LH</span>.<span class="fn">success</span>(...));
+}</div>
+        <button class="dbtn red" onclick="scenarioDeleteUser()"><i class="bi bi-person-x"></i> Simulasi Hapus</button>
+      </div>
+
+      <!-- approve instruktur -->
+      <div class="dc s-teal" style="animation-delay:.16s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--teal-l);color:var(--teal);"><i class="bi bi-person-check-fill"></i></div><div class="dc-title">Approve Instruktur</div></div>
+        <div class="dc-desc">Prompt catatan → Confirm → Loading → Success dialog.</div>
+        <div class="dc-code"><span class="kw">const</span> catatan = <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">prompt</span>(...);
+<span class="kw">if</span>(catatan !== <span class="str">null</span> &&
+  <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">confirm</span>(...)){
+  <span class="co">// proses approval...</span>
+}</div>
+        <button class="dbtn teal" onclick="scenarioApproveInstructor()"><i class="bi bi-person-check"></i> Simulasi Approve</button>
+      </div>
+
+      <!-- publish kursus -->
+      <div class="dc s-purple" style="animation-delay:.24s;">
+        <div class="dc-top"><div class="dc-icon" style="background:var(--purple-l);color:var(--purple);"><i class="bi bi-send-fill"></i></div><div class="dc-title">Publish Kursus</div></div>
+        <div class="dc-desc">Multi-dialog (Draft/Publish) → Loading → Success atau Info toast.</div>
+        <div class="dc-code"><span class="kw">const</span> action = <span class="kw">await</span> <span class="fn">LH</span>.<span class="fn">dialog</span>({
+  buttons: [
+    {value:<span class="str">'draft'</span>,...},
+    {value:<span class="str">'publish'</span>,...}
+  ]
+});</div>
+        <button class="dbtn purple" onclick="scenarioPublishCourse()"><i class="bi bi-send-fill"></i> Simulasi Publish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 8. API REFERENCE ══ -->
+  <div class="section">
+    <div class="sec-label">
+      <div class="sec-num">8</div>
+      <div>
+        <div class="sec-title">Referensi API</div>
+        <div class="sec-sub">Semua method dan opsi yang tersedia di LH Alerts</div>
+      </div>
+    </div>
+    <div class="api-wrap">
+      <table class="api-tbl">
+        <thead>
+          <tr><th>Method</th><th>Parameter Utama</th><th>Return</th><th>Keterangan</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="method"><code>LH.toast(opts)</code></td><td><code>type</code> · <code>title</code> · <code>message</code> · <code>duration</code> · <code>position</code> · <code>icon</code> · <code>closable</code></td><td class="ret">{ dismiss() }</td><td>Toast pojok layar, auto-dismiss + progress bar</td></tr>
+          <tr><td class="method"><code>LH.success(msg)</code></td><td><code>message</code> · <code>title?</code></td><td class="ret">{ dismiss() }</td><td>Shorthand green toast</td></tr>
+          <tr><td class="method"><code>LH.error(msg)</code></td><td><code>message</code> · <code>title?</code></td><td class="ret">{ dismiss() }</td><td>Shorthand red toast</td></tr>
+          <tr><td class="method"><code>LH.warning(msg)</code></td><td><code>message</code> · <code>title?</code></td><td class="ret">{ dismiss() }</td><td>Shorthand warning toast</td></tr>
+          <tr><td class="method"><code>LH.info(msg)</code></td><td><code>message</code> · <code>title?</code></td><td class="ret">{ dismiss() }</td><td>Shorthand info toast</td></tr>
+          <tr><td class="method"><code>LH.dialog(opts)</code></td><td><code>type</code> · <code>title</code> · <code>message</code> · <code>icon</code> · <code>buttons[]</code></td><td class="ret">Promise&lt;value&gt;</td><td>Modal dialog dengan tombol custom</td></tr>
+          <tr><td class="method"><code>LH.confirm(opts)</code></td><td><code>type</code> · <code>title</code> · <code>message</code> · <code>confirmLabel</code> · <code>confirmClass</code> · <code>requireCheck</code> · <code>checkLabel</code></td><td class="ret">Promise&lt;boolean&gt;</td><td>Konfirmasi ya/tidak, opsional checkbox</td></tr>
+          <tr><td class="method"><code>LH.prompt(opts)</code></td><td><code>title</code> · <code>label</code> · <code>placeholder</code> · <code>defaultValue</code> · <code>inputType</code> · <code>validate()</code> · <code>required</code></td><td class="ret">Promise&lt;string|null&gt;</td><td>Input dialog dengan validasi custom</td></tr>
+          <tr><td class="method"><code>LH.loading(opts)</code></td><td><code>title</code> · <code>message</code> · <code>closable</code></td><td class="ret">{ close(), setTitle(), setMessage() }</td><td>Full-screen loading overlay</td></tr>
+          <tr><td class="method"><code>LH.alert(el, opts)</code></td><td><code>type</code> · <code>title</code> · <code>message</code> · <code>icon</code> · <code>closable</code> · <code>prepend</code></td><td class="ret">HTMLElement</td><td>Inject inline alert ke elemen DOM</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- button classes -->
+    <div class="dc" style="margin-top:16px;">
+      <div class="dc-top"><div class="dc-icon" style="background:var(--primary-xl);color:var(--primary);"><i class="bi bi-palette-fill"></i></div><div class="dc-title">Button Classes — untuk dialog & confirm</div></div>
+      <div class="btn-row" style="margin-top:4px;">
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--primary-xl);color:var(--primary);padding:3px 9px;border-radius:5px;">lh-btn-primary</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--success-l);color:var(--success);padding:3px 9px;border-radius:5px;">lh-btn-success</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--danger-l);color:var(--danger);padding:3px 9px;border-radius:5px;">lh-btn-danger</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--warning-l);color:var(--warning);padding:3px 9px;border-radius:5px;">lh-btn-warning</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--purple-l);color:var(--purple);padding:3px 9px;border-radius:5px;">lh-btn-purple</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--teal-l);color:var(--teal);padding:3px 9px;border-radius:5px;">lh-btn-teal</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:#eef2ff;color:#6366f1;padding:3px 9px;border-radius:5px;">lh-btn-indigo</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:#fff7ed;color:#f97316;padding:3px 9px;border-radius:5px;">lh-btn-orange</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--body-bg);color:var(--muted);padding:3px 9px;border-radius:5px;border:1px solid var(--border);">lh-btn-ghost</span>
+        <span style="font-size:12px;font-family:'DM Mono',monospace;background:var(--body-bg);color:var(--muted);padding:3px 9px;border-radius:5px;border:1px solid var(--border);">lh-btn-cancel</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <strong>LH Alerts v1.0</strong> — LearnHub LMS Notification Library<br>
+    <span style="margin-top:4px;display:block;">Poppins · Bootstrap Icons · Vanilla JS · Zero Dependencies</span>
+  </div>
+
+</div>
+
+<!-- Load LH Alerts -->
+<script src="lh-alerts.js"></script>
+
+<script>
+/* helper */
+function setResult(id, html, cls) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'result ' + (cls || '');
+  el.innerHTML = html;
+}
+
+/* ── DIALOG demos ── */
+function demoInfoDialog() {
+  LH.dialog({
+    type: 'info', icon: 'shield',
+    title: 'Informasi Akses Admin',
+    message: 'Akun Anda memiliki hak akses <strong>Super Administrator</strong>. Semua aktivitas tercatat dalam log sistem dan dapat diaudit kapan saja.',
+    buttons: [{ label: 'Mengerti', class: 'lh-btn-primary', close: true, icon: '<i class="bi bi-check2"></i>' }]
+  });
+}
+function demoSuccessDialog() {
+  LH.dialog({
+    type: 'success', icon: 'save',
+    title: 'Kursus Berhasil Disimpan!',
+    message: 'Kursus <strong>Laravel 11 Fullstack</strong> telah tersimpan dan siap untuk dipublikasikan kepada pelajar.',
+    buttons: [
+      { label: 'Lihat Kursus', class: 'lh-btn-ghost', close: true },
+      { label: 'Kembali ke Daftar', class: 'lh-btn-success', close: true, icon: '<i class="bi bi-arrow-left"></i>' }
+    ]
+  });
+}
+function demoWarningDialog() {
+  LH.dialog({
+    type: 'warning', icon: 'lock',
+    title: 'Role Tidak Memiliki Akses',
+    message: 'Role <strong>Instruktur</strong> tidak memiliki izin untuk mengakses menu <strong>Pengaturan Sistem</strong>. Hubungi Administrator untuk mendapatkan akses.',
+    buttons: [
+      { label: 'Minta Akses', class: 'lh-btn-warning', close: true, icon: '<i class="bi bi-envelope"></i>' },
+      { label: 'Tutup', class: 'lh-btn-ghost', close: true }
+    ]
+  });
+}
+async function demoMultiDialog() {
+  var action = await LH.dialog({
+    type: 'purple', icon: 'send',
+    title: 'Simpan atau Publikasikan?',
+    message: 'Pilih tindakan untuk kursus <strong>Laravel 11 Fullstack</strong> yang telah Anda lengkapi.',
+    buttons: [
+      { label: 'Batal', class: 'lh-btn-ghost', close: true, value: 'cancel' },
+      { label: 'Simpan Draft', class: 'lh-btn-ghost', close: true, value: 'draft', icon: '<i class="bi bi-floppy2"></i>' },
+      { label: 'Publikasikan', class: 'lh-btn-purple', close: true, value: 'publish', icon: '<i class="bi bi-send-fill"></i>' }
+    ]
+  });
+  if (action === 'publish') setResult('r-multi', '✅ Promise resolve: <strong>"publish"</strong> — Kursus dipublikasikan!', 'ok');
+  else if (action === 'draft') setResult('r-multi', '💾 Promise resolve: <strong>"draft"</strong> — Tersimpan sebagai draft.', 'inf');
+  else setResult('r-multi', '❌ Promise resolve: <strong>"cancel"</strong> — Dibatalkan.', 'fail');
+}
+
+/* ── CONFIRM demos ── */
+async function demoDeleteConfirm() {
+  var ok = await LH.confirm({
+    type: 'error', icon: 'delete',
+    title: 'Hapus Pengguna?',
+    message: 'Akun <strong>Budi Santoso</strong> (budi.s@gmail.com) akan dihapus permanen dari sistem.',
+    confirmLabel: 'Ya, Hapus', confirmClass: 'lh-btn-danger',
+    cancelLabel: 'Batalkan',
+    confirmIcon: '<i class="bi bi-trash3"></i>'
+  });
+  setResult('r-delete', ok ? '✅ Dikonfirmasi — pengguna dihapus.' : '❌ Dibatalkan.', ok ? 'ok' : 'fail');
+}
+async function demoLogoutConfirm() {
+  var ok = await LH.confirm({
+    type: 'warning', icon: 'logout',
+    title: 'Keluar dari LearnHub?',
+    message: 'Sesi Anda akan berakhir. Pastikan semua pekerjaan sudah tersimpan.',
+    confirmLabel: 'Ya, Keluar', confirmClass: 'lh-btn-warning',
+    confirmIcon: '<i class="bi bi-box-arrow-right"></i>'
+  });
+  setResult('r-logout', ok ? '✅ Logout dikonfirmasi.' : '❌ Batal, tetap di sistem.', ok ? 'ok' : 'fail');
+}
+async function demoDangerConfirm() {
+  var ok = await LH.confirm({
+    type: 'error', icon: 'shield',
+    title: 'Hapus Seluruh Cache Sistem?',
+    message: 'Ini akan menghapus seluruh cache aplikasi. Platform mungkin lambat sementara cache dibangun ulang.',
+    confirmLabel: 'Ya, Hapus Cache', confirmClass: 'lh-btn-danger',
+    requireCheck: true,
+    checkLabel: 'Saya memahami bahwa proses ini dapat mempengaruhi performa sementara.'
+  });
+  setResult('r-danger', ok ? '✅ Dikonfirmasi — cache dibersihkan.' : '❌ Dibatalkan.', ok ? 'ok' : 'fail');
+}
+async function demoResetConfirm() {
+  var ok = await LH.confirm({
+    type: 'info', icon: 'key',
+    title: 'Reset Password?',
+    message: 'Link reset password akan dikirim ke email <strong>siti.rahma@gmail.com</strong>. Link berlaku 15 menit.',
+    confirmLabel: 'Kirim Link Reset', confirmClass: 'lh-btn-primary',
+    confirmIcon: '<i class="bi bi-send"></i>'
+  });
+  setResult('r-reset', ok ? '✅ Link reset password dikirim ke email.' : '❌ Dibatalkan.', ok ? 'ok' : 'fail');
+}
+
+/* ── PROMPT demos ── */
+async function demoSimplePrompt() {
+  var val = await LH.prompt({
+    type: 'info', icon: 'bell',
+    title: 'Tambah Kategori Baru',
+    message: 'Masukkan nama kategori kursus yang akan ditambahkan.',
+    label: 'Nama Kategori',
+    placeholder: 'cth: Machine Learning, UI/UX Design',
+    confirmLabel: 'Tambahkan'
+  });
+  setResult('r-simple', val ? '✅ Input: <strong>"' + val + '"</strong>' : '❌ Dibatalkan.', val ? 'ok' : 'fail');
+}
+async function demoEmailPrompt() {
+  var val = await LH.prompt({
+    type: 'teal', icon: 'mail',
+    title: 'Tambah Email Notifikasi',
+    label: 'Alamat Email',
+    placeholder: 'nama@learnhub.id',
+    inputType: 'email',
+    confirmLabel: 'Daftarkan Email',
+    validate: function(v) {
+      if (!v.includes('@')) return 'Format email tidak valid.';
+      if (!v.includes('.')) return 'Domain email tidak lengkap.';
+      return null;
+    }
+  });
+  setResult('r-email', val ? '✅ Email terdaftar: <strong>' + val + '</strong>' : '❌ Dibatalkan.', val ? 'ok' : 'fail');
+}
+async function demoRenamePrompt() {
+  var val = await LH.prompt({
+    type: 'purple', icon: 'course',
+    title: 'Rename Kursus',
+    message: 'Ubah nama kursus yang sudah ada.',
+    label: 'Nama Baru',
+    defaultValue: 'Laravel 11 Fullstack — Dari Nol Hingga Deploy',
+    confirmLabel: 'Simpan Nama'
+  });
+  setResult('r-rename', val ? '✅ Nama baru: <strong>"' + val + '"</strong>' : '❌ Dibatalkan.', val ? 'ok' : 'fail');
+}
+async function demoPasswordPrompt() {
+  var val = await LH.prompt({
+    type: 'warning', icon: 'lock',
+    title: 'Ganti Password',
+    message: 'Password harus kuat — minimal 8 karakter, huruf besar, dan angka.',
+    label: 'Password Baru',
+    inputType: 'password',
+    placeholder: 'Min 8 karakter + huruf besar + angka',
+    confirmLabel: 'Perbarui Password',
+    validate: function(v) {
+      if (v.length < 8) return 'Password minimal 8 karakter.';
+      if (!/[A-Z]/.test(v)) return 'Harus ada setidaknya satu huruf kapital.';
+      if (!/[0-9]/.test(v)) return 'Harus ada setidaknya satu angka.';
+      return null;
+    }
+  });
+  setResult('r-password', val ? '✅ Password berhasil diperbarui.' : '❌ Dibatalkan.', val ? 'ok' : 'fail');
+}
+
+/* ── LOADING demos ── */
+function demoBasicLoading() {
+  var ld = LH.loading({ title: 'Memuat Data Kursus...', message: 'Mengambil 380 kursus dari database' });
+  setTimeout(function() { ld.close(); LH.success('Data berhasil dimuat dari server.'); }, 2500);
+}
+function demoDynamicLoading() {
+  var ld = LH.loading({ title: 'Mengunggah File...', message: 'Mempersiapkan file (1/3)' });
+  setTimeout(function() { ld.setTitle('Mengunggah...'); ld.setMessage('hero-laravel-course.jpg (2/3)'); }, 900);
+  setTimeout(function() { ld.setMessage('modul-laravel-pemula.pdf (3/3)'); }, 1900);
+  setTimeout(function() {
+    ld.close(function() {
+      LH.dialog({
+        type: 'success', icon: 'upload',
+        title: 'Upload Selesai!',
+        message: '3 file berhasil diunggah ke <strong>Media Library</strong> — thumbnail, dokumen, dan video materi.',
+        buttons: [{ label: 'Lihat Media', class: 'lh-btn-success', close: true, icon: '<i class="bi bi-images"></i>' }]
+      });
+    });
+  }, 2800);
+}
+
+/* ── SCENARIOS ── */
+async function scenarioSaveCourse() {
+  var ld = LH.loading({ title: 'Menyimpan Kursus...', message: 'Mengunggah perubahan ke server' });
+  await new Promise(r => setTimeout(r, 1800));
+  ld.close(function() {
+    LH.dialog({
+      type: 'success', icon: 'cert',
+      title: 'Kursus Berhasil Diperbarui!',
+      message: 'Kursus <strong>Laravel 11 Fullstack</strong> telah diperbarui dan perubahan aktif dalam 30 detik.',
+      buttons: [
+        { label: 'Lihat Kursus', class: 'lh-btn-ghost', close: true },
+        { label: 'OK', class: 'lh-btn-success', close: true, icon: '<i class="bi bi-check2"></i>' }
+      ]
+    }).then(function() { LH.info('Kembali ke halaman daftar kursus.'); });
+  });
+}
+async function scenarioDeleteUser() {
+  var ok = await LH.confirm({
+    type: 'error', icon: 'delete',
+    title: 'Hapus Akun Pengguna?',
+    message: 'Akun <strong>Rizky Pratama</strong> akan dihapus permanen. Semua riwayat kursus dan transaksi juga ikut terhapus.',
+    confirmLabel: 'Hapus Permanen', confirmClass: 'lh-btn-danger'
+  });
+  if (!ok) { LH.warning('Penghapusan dibatalkan.'); return; }
+  var ld = LH.loading({ title: 'Menghapus Akun...', message: 'Membersihkan data terkait' });
+  await new Promise(r => setTimeout(r, 1500));
+  ld.close(function() { LH.success('Akun Rizky Pratama berhasil dihapus dari sistem.'); });
+}
+async function scenarioApproveInstructor() {
+  var catatan = await LH.prompt({
+    type: 'teal', icon: 'user',
+    title: 'Catatan Persetujuan Instruktur',
+    message: 'Tambahkan catatan untuk permohonan instruktur <strong>Siti Rahma</strong>.',
+    label: 'Catatan (opsional)',
+    placeholder: 'cth: Dokumen lengkap, pengalaman mengajar 5 tahun.',
+    required: false,
+    confirmLabel: 'Lanjut ke Konfirmasi'
+  });
+  if (catatan === null) { LH.info('Proses approval dibatalkan.'); return; }
+  var ok = await LH.confirm({
+    type: 'teal', icon: 'check',
+    title: 'Konfirmasi Persetujuan Instruktur',
+    message: 'Permohonan <strong>Siti Rahma</strong> akan disetujui. Email notifikasi akan dikirim secara otomatis.',
+    confirmLabel: 'Ya, Setujui', confirmClass: 'lh-btn-teal'
+  });
+  if (!ok) { LH.warning('Approval dibatalkan.'); return; }
+  var ld = LH.loading({ title: 'Memproses Persetujuan...' });
+  await new Promise(r => setTimeout(r, 1600));
+  ld.close(function() {
+    LH.dialog({
+      type: 'success', icon: 'user',
+      title: 'Instruktur Disetujui!',
+      message: 'Siti Rahma kini resmi menjadi instruktur LearnHub' + (catatan ? ' dengan catatan: <em>"' + catatan + '"</em>' : '.'),
+      buttons: [{ label: 'Lihat Profil Instruktur', class: 'lh-btn-success', close: true }]
+    });
+  });
+}
+async function scenarioPublishCourse() {
+  var action = await LH.dialog({
+    type: 'indigo', icon: 'course',
+    title: 'Simpan Draft atau Publikasikan?',
+    message: 'Kursus <strong>React JS + Next.js 14 Masterclass</strong> siap untuk dipublikasikan.',
+    buttons: [
+      { label: 'Batal', class: 'lh-btn-ghost', close: true, value: null },
+      { label: 'Simpan Draft', class: 'lh-btn-ghost', close: true, value: 'draft', icon: '<i class="bi bi-floppy2"></i>' },
+      { label: 'Publikasikan Sekarang', class: 'lh-btn-indigo', close: true, value: 'publish', icon: '<i class="bi bi-send-fill"></i>' }
+    ]
+  });
+  if (!action) return;
+  var ld = LH.loading({ title: action === 'publish' ? 'Mempublikasikan...' : 'Menyimpan Draft...' });
+  await new Promise(r => setTimeout(r, 1400));
+  ld.close(function() {
+    if (action === 'publish') LH.success('Kursus berhasil dipublikasikan dan kini dapat diakses pelajar!', 'Kursus Live! 🎉');
+    else LH.toast({ type: 'indigo', title: 'Tersimpan sebagai Draft', message: 'Kursus tersimpan. Publikasikan kapan saja dari menu Kursus.' });
+  });
+}
+</script>
+</body>
+</html>
